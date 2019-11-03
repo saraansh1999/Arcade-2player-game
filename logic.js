@@ -138,7 +138,7 @@ function create(){
         function cuttree(cutterobj, tree)
         {
             cutters[i].stop()
-            cutterobj.anims.stop()
+            // cutterobj.anims.pause()
             cutters[i].iscutting = true;
             cutters[i].startcutting()
 
@@ -148,14 +148,19 @@ function create(){
 function update(){
     for(var i = 0; i < num_cutters; i++)
     {
-        if(cutters[i].obj.body.velocity.x == 0 && cutters[i].obj.body.velocity.y == 0){
+        if(cutters[i].obj.body.velocity.x == 0 && cutters[i].obj.body.velocity.y == 0)
+        {
+
             min = 100000
             trees.getChildren().forEach(function(tree){
-                tempDis = findDis(tree, cutters[i].obj);
-                if(tempDis < min){
-                    min = tempDis;
-                    destx = tree.x;
-                    desty = tree.y;
+                if(tree.active == true)
+                {
+                    tempDis = findDis(tree, cutters[i].obj);
+                    if(tempDis < min){
+                        min = tempDis;
+                        destx = tree.x;
+                        desty = tree.y;
+                    }
                 }
             }, this);
             cutters[i].setDest(destx, desty);
@@ -190,7 +195,6 @@ function update(){
         
         // to reduce health bar , find the index of nearest tree and reduce
         // the health of corresponding bar
-        // console.log(i);
         if(cutters[i].iscutting == 1)
         {
             var a = 0;
@@ -199,6 +203,20 @@ function update(){
                 if(cutters[i].destx == tree.x && cutters[i].desty == tree.y)                
                 {
                     bar[a].reduce();
+                    if(bar[a].health == 0)
+                    {
+                        console.log(a,"removed");
+                        cutters[i].iscutting = 0;
+                        cutters[i].cutfrom = 'no';
+                        cutters[i].unstopped = 1;
+                        trees.killAndHide(tree);
+                        // cutters[i].animations.stop(null, true);
+                        // console.log(trees.getLength());
+                        // console.log(trees.countActive());
+                        // console.log(trees.countActive());
+                        // console.log(trees.getLength());
+                        // console.log(trees.children[a].x);
+                    }
                 }
                 a = a + 1; 
             }, this);

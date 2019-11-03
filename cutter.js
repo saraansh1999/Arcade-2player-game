@@ -54,8 +54,8 @@ class Cutter{
 		}
 	}
 	stop(){
-		this.obj.setVelocityX(0);
-		this.obj.setVelocityY(0);
+		// this.obj.setVelocityX(0);
+		// this.obj.setVelocityY(0);
 		this.unstopped = false;
 	}	
 	startcutting(){
