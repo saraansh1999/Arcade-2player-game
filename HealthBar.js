@@ -1,14 +1,18 @@
 class HealthBar
 {
 	constructor(obj){
-		console.log("Babba");
 		this.obj=obj;
+		this.health = 1;
 	}
 
-	setPercent(percent)
+	reduce()
 	{
-		percent=percent/100;
-		this.obj.scaleX = percent;
+		if(this.health-0.01 > 0)
+			this.health = this.health - 0.01;
+		else
+			this.health = 0;
+
+		this.obj.scaleX = this.health;
 	}
 	
 }

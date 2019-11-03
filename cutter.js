@@ -4,11 +4,18 @@ class Cutter{
 		this.obj = obj
 		this.unstopped = true;
 		this.cutfrom = 'none'
+		this.iscutting = false;
 	}
 	setDest(x, y){
 		this.destx = x
 		this.desty = y
 	}
+
+	setid(id)
+	{
+		this.id = id
+	}
+
 	clip(c){
 		if(c == 'x'){
 			if(Math.abs(this.destx - this.obj.x) < this.vel/10)

@@ -75,7 +75,6 @@ function create(){
         var y = Phaser.Math.RND.between(100, CANVAS_H-100);
         trees.create(x, y, 'tree').setScale(0.8);
         var tempBar=new HealthBar(this.add.image(x,y-50,'healthBar'));
-        tempBar.setPercent(20);
         bar.push(tempBar);
     }
 
@@ -136,16 +135,19 @@ function create(){
     //collisions
     for(let i = 0; i < num_cutters; i++){
         this.physics.add.collider(cutters[i].obj, trees, cuttree, null, this);
-        function cuttree(cutterobj, tree){
+        function cuttree(cutterobj, tree)
+        {
             cutters[i].stop()
             cutterobj.anims.stop()
+            cutters[i].iscutting = true;
             cutters[i].startcutting()
+
         }
     }
 }
-
 function update(){
-    for(var i = 0; i < num_cutters; i++){
+    for(var i = 0; i < num_cutters; i++)
+    {
         if(cutters[i].obj.body.velocity.x == 0 && cutters[i].obj.body.velocity.y == 0){
             min = 100000
             trees.getChildren().forEach(function(tree){
@@ -185,6 +187,21 @@ function update(){
         else if(cutters[i].cutfrom == 'right'){
             cutters[i].obj.anims.play('cutfromright', true)
         }
-
+        
+        // to reduce health bar , find the index of nearest tree and reduce
+        // the health of corresponding bar
+        // console.log(i);
+        if(cutters[i].iscutting == 1)
+        {
+            var a = 0;
+            trees.getChildren().forEach(function(tree)
+            {
+                if(cutters[i].destx == tree.x && cutters[i].desty == tree.y)                
+                {
+                    bar[a].reduce();
+                }
+                a = a + 1; 
+            }, this);
+        }
     }
 }
