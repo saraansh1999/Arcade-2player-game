@@ -50,7 +50,7 @@ class Cutter{
 		this.obj.setVelocityX(0);
 		this.obj.setVelocityY(0);
 		this.unstopped = false;
-	}
+	}	
 	startcutting(){
 		if(Math.abs(this.obj.x - this.destx) > Math.abs(this.obj.y - this.desty)){
 			if(this.obj.x < this.destx){

@@ -41,10 +41,11 @@ function preload(){
     this.load.image('sand', 'assets/sand.jpg');
     this.load.image('tree', 'assets/treenew.png');
     // this.load.image('cutter', 'assets/cutter.png');
-    this.load.image('statusBar', 'assets/lifebar.png');
+    this.load.image('healthBar', 'assets/lifebar.png');
     this.load.spritesheet('cutter', 'assets/cutter_sprites.png', 
         {frameWidth: 64, frameHeight: 64}
         );
+
 }
 
 var num_cutters, cutters, num_trees, trees;
@@ -53,20 +54,29 @@ function create(){
     //set bg
     this.bg = this.add.image(0, 0, 'sand').setScale(4);
 
+    //create woodcutter
     num_cutters = 1
     cutters = []
     for (var i = 0; i < num_cutters; i++) {
         var x = Phaser.Math.RND.between(100, CANVAS_W-100);
         var y = Phaser.Math.RND.between(100, CANVAS_H-100);
-        tempCutter = new Cutter(this.physics.add.sprite(x, y, 'cutter'), 50)
+        tempCutter = new Cutter(this.physics.add.sprite(x, y, 'cutter'), 200)
         cutters.push(tempCutter);
     }
-    num_trees = 2
+
+    //create health bars
+    bar = [];
+
+    //create trees
+    num_trees = 2 
     trees = this.physics.add.staticGroup();
     for (var i = 0; i < num_trees; i++) {
         var x = Phaser.Math.RND.between(100, CANVAS_W-100);
         var y = Phaser.Math.RND.between(100, CANVAS_H-100);
         trees.create(x, y, 'tree').setScale(0.8);
+        var tempBar=new HealthBar(this.add.image(x,y-50,'healthBar'));
+        tempBar.setPercent(20);
+        bar.push(tempBar);
     }
 
     //animations
