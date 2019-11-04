@@ -49,17 +49,19 @@ function preload(){
 }
 
 var num_cutters, cutters, num_trees, trees;
-
+	
 function create(){
     //set bg
     this.bg = this.add.image(0, 0, 'sand').setScale(4);
 
     //create woodcutter
-    num_cutters = 1
+    num_cutters = 4
+    var a =50;
     cutters = []
     for (var i = 0; i < num_cutters; i++) {
-        var x = Phaser.Math.RND.between(100, CANVAS_W-100);
-        var y = Phaser.Math.RND.between(100, CANVAS_H-100);
+        var x = Phaser.Math.RND.between(0, 50);
+        var y = a
+        a= a+100;
         tempCutter = new Cutter(this.physics.add.sprite(x, y, 'cutter'), 200)
         cutters.push(tempCutter);
     }
@@ -68,7 +70,7 @@ function create(){
     bar = [];
 
     //create trees
-    num_trees = 2 
+    num_trees = 10
     trees = this.physics.add.staticGroup();
     for (var i = 0; i < num_trees; i++) {
         var x = Phaser.Math.RND.between(100, CANVAS_W-100);
@@ -137,11 +139,13 @@ function create(){
         this.physics.add.collider(cutters[i].obj, trees, cuttree, null, this);
         function cuttree(cutterobj, tree)
         {
-            cutters[i].stop()
-            // cutterobj.anims.pause()
-            cutters[i].iscutting = true;
-            cutters[i].startcutting()
-
+        	if(tree.active==true)
+        	{
+	            cutters[i].stop()
+	            // cutterobj.anims.pause()
+	            cutters[i].iscutting = true;
+	            cutters[i].startcutting()
+	        }
         }
     }
 }
@@ -195,6 +199,7 @@ function update(){
         
         // to reduce health bar , find the index of nearest tree and reduce
         // the health of corresponding bar
+       	var rem = -1;
         if(cutters[i].iscutting == 1)
         {
             var a = 0;
@@ -205,21 +210,43 @@ function update(){
                     bar[a].reduce();
                     if(bar[a].health == 0)
                     {
+                    	for(var j = 0; j<num_cutters ;j++)
+                    	{
+                    		if(cutters[j].destx == tree.x && cutters[j].desty == tree.y)
+                    		{
+	                        	cutters[j].iscutting = 0;
+	                        	cutters[j].cutfrom = 'no';
+	                        	cutters[j].unstopped = 1;
+                    		}
+                    	}
+                    	rem = a;
                         console.log(a,"removed");
-                        cutters[i].iscutting = 0;
-                        cutters[i].cutfrom = 'no';
-                        cutters[i].unstopped = 1;
                         trees.killAndHide(tree);
-                        // cutters[i].animations.stop(null, true);
-                        // console.log(trees.getLength());
-                        // console.log(trees.countActive());
-                        // console.log(trees.countActive());
-                        // console.log(trees.getLength());
-                        // console.log(trees.children[a].x);
+                        for(var j = a ; j < num_trees-1 ; j++)
+                        {
+                        	bar[j]=bar[j+1];
+                        }
+                        num_trees=num_trees-1;
                     }
                 }
                 a = a + 1; 
             }, this);
+        	var cnt =0;
+        	trees.getChildren().forEach(function(tree)
+            {
+            	if(cnt==rem)
+            	{
+            		trees.remove(tree);
+            	}
+            	cnt = cnt + 1;
+            }, this);
+            console.log("cnt",cnt);
         }
     }
+    var cnt=0;
+   	trees.getChildren().forEach(function(tree)
+    {
+    	cnt = cnt + 1;
+    }, this);
+    console.log("cnto",cnt);
 }
