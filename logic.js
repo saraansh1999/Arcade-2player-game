@@ -45,7 +45,9 @@ function preload(){
     this.load.spritesheet('cutter', 'assets/cutter_sprites.png', 
         {frameWidth: 64, frameHeight: 64}
         );
-
+    this.load.spritesheet('fox', 'assets/fox_sprites.png', {
+        frameWidth: 48, frameHeight: 48
+    });
 }
 
 var num_cutters, cutters, num_trees, trees;
@@ -80,7 +82,56 @@ function create(){
         bar.push(tempBar);
     }
 
+    // create fox
+    var x = Phaser.Math.RND.between(100, CANVAS_W-100);
+    var y = Phaser.Math.RND.between(100, CANVAS_H-100);
+    fox = new Fox(this.physics.add.sprite(x, y, 'fox'), 200);
+    fox.obj.setInteractive();
+    
+    this.input.keyboard.on('keyup', function(event){
+        if(event.key == "1")
+            selectFox(fox);
+    }, this);
+
     //animations
+    this.anims.create({
+        key: 'foxright',
+        frames: this.anims.generateFrameNumbers('fox', {start: 25, end: 26}),
+        frameRate: 10,
+        repeat: -1
+    });
+    this.anims.create({
+        key: 'foxleft',
+        frames: this.anims.generateFrameNumbers('fox', {start: 13, end: 14}),
+        frameRate: 10,
+        repeat: -1
+    });
+    this.anims.create({
+        key: 'foxdown',
+        frames: this.anims.generateFrameNumbers('fox', {start: 1, end: 2}),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'foxup',
+        frames: this.anims.generateFrameNumbers('fox', {start: 37, end: 38}),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'selectedFox',
+        frames: this.anims.generateFrameNumbers('fox', {start: 10, end: 10}),
+        frameRate: 10,
+        repeat: -1
+    });
+    this.anims.create({
+        key: 'stand',
+        frames: this.anims.generateFrameNumbers('fox', {start: 1, end: 1}),
+        frameRate: 10,
+        repeat: -1
+    });
     this.anims.create({
         key: 'up',
         frames: this.anims.generateFrameNumbers('cutter', {start: 105, end: 112}),
@@ -149,7 +200,40 @@ function create(){
         }
     }
 }
+
+function selectFox(obj){
+    obj.stand = false;
+    obj.selected = true;
+    obj.obj.anims.play('selectedFox', true);
+}
+
 function update(){
+    if(fox.stand == true){
+        fox.obj.anims.play('stand', true);
+    }
+    this.input.on('pointerup', function(event){
+        if(fox.selected){
+            fox.moving = true;
+            fox.selected = false;
+            fox.destx = this.input.mousePointer.x;
+            fox.desty = this.input.mousePointer.y;
+        }
+    }, this);
+    
+    fox.move();
+    if(fox.obj.body.velocity.x > 0){
+        fox.obj.anims.play('foxright', true)
+    }
+    else if(fox.obj.body.velocity.x < 0){
+        fox.obj.anims.play('foxleft', true)
+    }
+    if(fox.obj.body.velocity.y > 0){
+        fox.obj.anims.play('foxdown', true)
+    }
+    else if(fox.obj.body.velocity.y < 0){
+        fox.obj.anims.play('foxup', true)
+    }
+    
     for(var i = 0; i < num_cutters; i++)
     {
         if(cutters[i].obj.body.velocity.x == 0 && cutters[i].obj.body.velocity.y == 0)
