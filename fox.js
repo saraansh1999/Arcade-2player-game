@@ -1,8 +1,8 @@
 class Fox{
 	constructor(obj, vel){
 		this.obj = obj;
-		this.obj.displayWidth = 64;
-		this.obj.displayHeight = 64;
+		this.obj.displayWidth = 40;
+		this.obj.displayHeight = 40;
         this.stand = true;
         this.selected = false;
         this.moving = false;
@@ -54,5 +54,10 @@ class Fox{
             
             
         }
+    }
+    stop(){
+    	this.moving = false;
+    	this.obj.setVelocityX(0);
+    	this.obj.setVelocityY(0);
     }
 }

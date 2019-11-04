@@ -45,8 +45,20 @@ function preload(){
     this.load.spritesheet('cutter', 'assets/cutter_sprites.png', 
         {frameWidth: 64, frameHeight: 64}
         );
-    this.load.spritesheet('fox', 'assets/fox_sprites.png', {
-        frameWidth: 48, frameHeight: 48
+    this.load.spritesheet('fox1', 'assets/wolf1.png', {
+        frameWidth: 32, frameHeight: 64
+    });
+    this.load.spritesheet('fox2', 'assets/wolf2.png', {
+        frameWidth: 64, frameHeight: 32
+    });
+    this.load.spritesheet('fox3', 'assets/wolf3.png', {
+        frameWidth: 64, frameHeight: 32
+    });
+    this.load.spritesheet('foxrest', 'assets/howl.png', {
+        frameWidth: 64, frameHeight: 64
+    });
+    this.load.spritesheet('foxsel', 'assets/howlsel.png', {
+        frameWidth: 64, frameHeight: 64
     });
 }
 
@@ -96,39 +108,39 @@ function create(){
     //animations
     this.anims.create({
         key: 'foxright',
-        frames: this.anims.generateFrameNumbers('fox', {start: 25, end: 26}),
+        frames: this.anims.generateFrameNumbers('fox2', {start: 6, end: 9}),
         frameRate: 10,
         repeat: -1
     });
     this.anims.create({
         key: 'foxleft',
-        frames: this.anims.generateFrameNumbers('fox', {start: 13, end: 14}),
+        frames: this.anims.generateFrameNumbers('fox3', {start: 6 , end: 9}),
         frameRate: 10,
         repeat: -1
     });
     this.anims.create({
         key: 'foxdown',
-        frames: this.anims.generateFrameNumbers('fox', {start: 1, end: 2}),
+        frames: this.anims.generateFrameNumbers('fox1', {start: 31, end: 34}),
         frameRate: 10,
         repeat: -1
     });
 
     this.anims.create({
         key: 'foxup',
-        frames: this.anims.generateFrameNumbers('fox', {start: 37, end: 38}),
+        frames: this.anims.generateFrameNumbers('fox1', {start: 36, end: 39}),
         frameRate: 10,
         repeat: -1
     });
 
     this.anims.create({
         key: 'selectedFox',
-        frames: this.anims.generateFrameNumbers('fox', {start: 10, end: 10}),
+        frames: this.anims.generateFrameNumbers('foxsel', {start: 0, end: 0}),
         frameRate: 10,
         repeat: -1
     });
     this.anims.create({
-        key: 'stand',
-        frames: this.anims.generateFrameNumbers('fox', {start: 1, end: 1}),
+        key: 'foxstand',
+        frames: this.anims.generateFrameNumbers('foxrest', {start: 0, end: 0}),
         frameRate: 10,
         repeat: -1
     });
@@ -198,19 +210,20 @@ function create(){
 	            cutters[i].startcutting()
 	        }
         }
+    	this.physics.add.collider(cutters[i].obj, fox, eatcutter, null, this);
+    	function eatcutter(cutterobj, fox){
+
+    	}
     }
 }
 
 function selectFox(obj){
     obj.stand = false;
     obj.selected = true;
-    obj.obj.anims.play('selectedFox', true);
+    obj.stop()
 }
 
 function update(){
-    if(fox.stand == true){
-        fox.obj.anims.play('stand', true);
-    }
     this.input.on('pointerup', function(event){
         if(fox.selected){
             fox.moving = true;
@@ -221,6 +234,12 @@ function update(){
     }, this);
     
     fox.move();
+    if(fox.stand == true){
+        fox.obj.anims.play('foxstand', true);
+    }
+    if(fox.selected == true){
+    	fox.obj.anims.play('selectedFox', true);	
+    }
     if(fox.obj.body.velocity.x > 0){
         fox.obj.anims.play('foxright', true)
     }
@@ -304,7 +323,7 @@ function update(){
                     		}
                     	}
                     	rem = a;
-                        console.log(a,"removed");
+                        // console.log(a,"removed");
                         trees.killAndHide(tree);
                         for(var j = a ; j < num_trees-1 ; j++)
                         {
@@ -324,7 +343,7 @@ function update(){
             	}
             	cnt = cnt + 1;
             }, this);
-            console.log("cnt",cnt);
+            // console.log("cnt",cnt);
         }
     }
     var cnt=0;
@@ -332,5 +351,5 @@ function update(){
     {
     	cnt = cnt + 1;
     }, this);
-    console.log("cnto",cnt);
+    // console.log("cnto",cnt);
 }
