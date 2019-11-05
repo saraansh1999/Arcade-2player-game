@@ -98,15 +98,21 @@ gamescene.create = function(){
         bar.push(tempBar);
     }
 
+    num_foxes = 1;
+    fox =  []; 
     // create fox
-    var x = Phaser.Math.RND.between(100, CANVAS_W-100);
-    var y = Phaser.Math.RND.between(100, CANVAS_H-100);
-    fox = new Fox(this.physics.add.sprite(x, y, 'fox'), 200);
-    fox.obj.setInteractive();
     
+    for (var i =0 ;i < num_foxes ; i++)
+    {
+        var x = Phaser.Math.RND.between(100, CANVAS_W-100);
+        var y = Phaser.Math.RND.between(100, CANVAS_H-100);
+        temp_fox = new Fox(this.physics.add.sprite(x, y, 'fox'), 200);
+        temp_fox.obj.setInteractive();
+        fox.push(temp_fox);
+    }
     this.input.keyboard.on('keyup', function(event){
         if(event.key == "1")
-            selectFox(fox);
+            selectFox(fox[0]);
     }, this);
 
     //create poachers
@@ -230,22 +236,20 @@ gamescene.create = function(){
 
 
 
+    collider_tree_cutter = [];
     //collisions
     for(let i = 0; i < num_cutters; i++){
-        this.physics.add.collider(cutters[i].obj, trees, cuttree, null, this);
+        x=this.physics.add.collider(cutters[i].obj, trees, cuttree, null, this);
+        collider_tree_cutter.push(x);
         function cuttree(cutterobj, tree)
         {
-        	if(tree.active==true)
-        	{
-               cutters[i].stop()
-	            // cutterobj.anims.pause()
-	            cutters[i].iscutting = true;
-	            cutters[i].startcutting()
-	        }
-        }
-        this.physics.add.collider(cutters[i].obj, fox, eatcutter, null, this);
-        function eatcutter(cutterobj, fox){
-
+            if(tree.active==true)
+            {
+                cutters[i].stop()
+                // cutterobj.anims.pause()
+                cutters[i].iscutting = true;
+                cutters[i].startcutting()
+            }
         }
     }
 }
@@ -345,56 +349,65 @@ gamescene.update = function(){
         }
     }
 
-    
+    //devesh    
     this.input.on('pointerup', function(event){
-        if(fox.selected){
-            fox.moving = true;
-            fox.selected = false;
-            fox.destx = this.input.mousePointer.x;
-            fox.desty = this.input.mousePointer.y;
+        if(fox[0].selected){
+            fox[0].moving = true;
+            fox[0].selected = false;
+            fox[0].destx = this.input.mousePointer.x;
+            fox[0].desty = this.input.mousePointer.y;
         }
     }, this);
     
-    fox.move();
-    if(fox.stand == true){
-        fox.obj.anims.play('foxstand', true);
-    }
-    if(fox.selected == true){
-    	fox.obj.anims.play('selectedFox', true);	
-    }
-    if(fox.obj.body.velocity.x > 0){
-        fox.obj.anims.play('foxright', true)
-    }
-    else if(fox.obj.body.velocity.x < 0){
-        fox.obj.anims.play('foxleft', true)
-    }
-    if(fox.obj.body.velocity.y > 0){
-        fox.obj.anims.play('foxdown', true)
-    }
-    else if(fox.obj.body.velocity.y < 0){
-        fox.obj.anims.play('foxup', true)
+    for(var i=0;i<num_foxes ;i++)
+    {
+        fox[i].move();
+        if(fox[i].stand == true){
+            fox[i].obj.anims.play('foxstand', true);
+        }
+        if(fox[i].selected == true){
+        	fox[i].obj.anims.play('selectedFox', true);	
+        }
+        if(fox[i].obj.body.velocity.x > 0){
+            fox[i].obj.anims.play('foxright', true)
+        }
+        else if(fox[i].obj.body.velocity.x < 0){
+            fox[i].obj.anims.play('foxleft', true)
+        }
+        if(fox[i].obj.body.velocity.y > 0){
+            fox[i].obj.anims.play('foxdown', true)
+        }
+        else if(fox[i].obj.body.velocity.y < 0){
+            fox[i].obj.anims.play('foxup', true)
+        }
     }
     
     for(var i = 0; i < num_cutters; i++)
     {
-        if(cutters[i].obj.body.velocity.x == 0 && cutters[i].obj.body.velocity.y == 0)
+        if(cutters[i].health != 0 )
         {
-
-            min = 100000
-            trees.getChildren().forEach(function(tree){
-                if(tree.active == true)
-                {
-                    tempDis = findDis(tree, cutters[i].obj);
-                    if(tempDis < min){
-                        min = tempDis;
-                        destx = tree.x;
-                        desty = tree.y;
-                    }
-                }
-            }, this);
-            cutters[i].setDest(destx, desty);
-        }
+	        if(cutters[i].obj.body.velocity.x == 0 && cutters[i].obj.body.velocity.y == 0)
+	        {
+	            min = 100000
+	            var cnt = 0;
+	            trees.getChildren().forEach(function(tree){
+	                cnt = cnt + 1;
+	                if(tree.active == true)
+	                {
+	                    tempDis = findDis(tree, cutters[i].obj);
+	                    if(tempDis < min){
+	                        min = tempDis;
+	                        destx = tree.x;
+	                        desty = tree.y;
+	                    }
+	                }
+	            }, this);
+	            if(cnt > 0)
+	            	cutters[i].setDest(destx, desty);
+	        }
+	    }
         cutters[i].move()
+
 
         if(cutters[i].obj.body.velocity.x > 0){
             cutters[i].obj.anims.play('right', true)
@@ -424,56 +437,98 @@ gamescene.update = function(){
         
         // to reduce health bar , find the index of nearest tree and reduce
         // the health of corresponding bar
-        var rem = -1;
-        if(cutters[i].iscutting == 1)
-        {
-            var a = 0;
-            trees.getChildren().forEach(function(tree)
-            {
-                if(cutters[i].destx == tree.x && cutters[i].desty == tree.y)                
-                {
-                    bar[a].reduce();
-                    if(bar[a].health == 0)
-                    {
-                    	for(var j = 0; j<num_cutters ;j++)
-                    	{
-                    		if(cutters[j].destx == tree.x && cutters[j].desty == tree.y)
-                    		{
-                              cutters[j].iscutting = 0;
-                              cutters[j].cutfrom = 'no';
-                              cutters[j].unstopped = 1;
-                          }
-                      }
-                      rem = a;
-                        // console.log(a,"removed");
-                        trees.killAndHide(tree);
-                        for(var j = a ; j < num_trees-1 ; j++)
-                        {
-                        	bar[j]=bar[j+1];
-                        }
-                        num_trees=num_trees-1;
-                    }
-                }
-                a = a + 1; 
-            }, this);
-            var cnt =0;
-            trees.getChildren().forEach(function(tree)
-            {
-            	if(cnt==rem)
-            	{
-            		trees.remove(tree);
-            	}
-            	cnt = cnt + 1;
-            }, this);
-            // console.log("cnt",cnt);
-        }
+        if(cutters[i].health != 0 )
+        { 
+	       	var rem = -1;
+	        if(cutters[i].iscutting == 1)
+	        {
+	            var a = 0;
+	            trees.getChildren().forEach(function(tree)
+	            {
+	                if(cutters[i].destx == tree.x && cutters[i].desty == tree.y)                
+	                {
+	                    bar[a].reduce();
+	                    if(bar[a].health == 0)
+	                    {
+	                    	for(var j = 0; j<num_cutters ;j++)
+	                    	{
+	                    		if(cutters[j].destx == tree.x && cutters[j].desty == tree.y)
+	                    		{
+		                        	cutters[j].iscutting = 0;
+		                        	cutters[j].cutfrom = 'no';
+		                        	cutters[j].unstopped = true;
+	                    		}
+	                    	}
+	                    	rem = a;
+	                        // console.log(a,"removed");
+	                        trees.killAndHide(tree);
+	                        for(var j = a ; j < num_trees-1 ; j++)
+	                        {
+	                        	bar[j]=bar[j+1];
+	                        }
+	                        num_trees=num_trees-1;
+	                    }
+	                }
+	                a = a + 1; 
+	            }, this);
+	        	var cnt =0;
+	        	trees.getChildren().forEach(function(tree)
+	            {
+	            	if(cnt==rem)
+	            	{
+	            		trees.remove(tree);
+	            	}
+	            	cnt = cnt + 1;
+	            }, this);
+	        }
+	    }
     }
-    var cnt=0;
-    trees.getChildren().forEach(function(tree)
+    
+    //attack of fox 
+   	for(var i =0 ;i < num_foxes ; i++)
     {
-    	cnt = cnt + 1;
-    }, this);
-    // console.log("cnto",cnt);
+        if(fox[i].cutter==-1)
+       	{
+    	    for(var j = 0 ; j < num_cutters ; j++)
+    	    {
+    	    	var dx=(cutters[j].obj.x-fox[i].obj.x);
+    	    	var dy=(cutters[j].obj.y-fox[i].obj.y);
+    	    	var d = (dx*dx+dy*dy);
+    	    	if(d < 8000)
+    	    	{
+    	   			fox[i].cutter = j;
+    	   			break;
+    	    	}
+    	    	// console.log(i,dx,dy,d);
+    	    }
+    	}
+
+    	if(fox[i].cutter != -1)
+    	{
+    		var id =fox[i].cutter;
+        	var dx=(cutters[id].obj.x-fox[i].obj.x);
+        	var dy=(cutters[id].obj.y-fox[i].obj.y);
+        	var d = (dx*dx+dy*dy);
+        	console.log(d);
+        	if(d < 8000)
+        	{
+    			cutters[id].reduce();
+    			if(cutters[id].health==0)
+    			{
+    				fox[i].cutter = -1;
+    				collider_tree_cutter[id].destroy;
+    	            cutters[id].setDest(20, id*50+50);
+    	    		cutters[id].obj.setTint(0x0000ff);
+    	    		cutters[id].unstopped = 1;
+    	    		cutters[id].cutfrom = 'no';
+    			}
+        	}
+        	else
+        	{
+        		fox[i].cutter = -1;
+        	}
+    	}
+    }
 }
 
 homescreen.preload = function(){

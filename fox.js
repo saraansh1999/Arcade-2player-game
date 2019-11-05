@@ -10,6 +10,7 @@ class Fox{
         this.destx = -1;
         this.desty = -1;
         this.vel = vel;
+        this.cutter = -1;
     }
     
     clip(c){

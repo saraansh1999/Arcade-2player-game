@@ -5,6 +5,7 @@ class Cutter{
 		this.unstopped = true;
 		this.cutfrom = 'none'
 		this.iscutting = false;
+		this.health = 100;
 	}
 	setDest(x, y){
 		this.destx = x
@@ -74,6 +75,13 @@ class Cutter{
 			else{
 				this.cutfrom = 'left'
 			}	
+		}
+	}
+	reduce()
+	{
+		if(this.health >0)
+		{
+			this.health -= 1;
 		}
 	}
 }
