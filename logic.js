@@ -58,10 +58,16 @@ gamescene.preload = function(){
     this.load.spritesheet('foxsel', 'assets/howlsel.png', {
         frameWidth: 64, frameHeight: 64
     });
+    this.load.spritesheet('poacher', 'assets/poacher.png', {
+        frameWidth: 64 , frameHeight: 64
+    });
 }
 
-var num_cutters, cutters, num_trees, trees;
-	
+var num_cutters, cutters, num_trees, trees, poachers, poachertl=false, poachertr=false, poacherbl=false, poacherbr=false;;
+var d = new Date()
+var t = d.getTime()
+
+
 gamescene.create = function(){
     //set bg
     this.bg = this.add.image(0, 0, 'sand').setScale(4);
@@ -102,6 +108,11 @@ gamescene.create = function(){
         if(event.key == "1")
             selectFox(fox);
     }, this);
+
+    //create poachers
+    num_poachers = 0
+    poachers = []
+
 
     //animations
     this.anims.create({
@@ -192,6 +203,30 @@ gamescene.create = function(){
         frameRate: 10,
         repeat: -1 
     })
+    this.anims.create({
+        key: 'poacherup',
+        frames: this.anims.generateFrameNumbers('poacher', {start: 105, end: 112}),
+        frameRate: 10,
+        repeat: -1
+    })
+    this.anims.create({
+        key: 'poacherdown',
+        frames: this.anims.generateFrameNumbers('poacher', {start: 131, end: 138}),
+        frameRate: 10,
+        repeat: -1
+    })
+    this.anims.create({
+        key: 'poacherleft',
+        frames: this.anims.generateFrameNumbers('poacher', {start: 118, end: 125}),
+        frameRate: 10,
+        repeat: -1
+    })
+    this.anims.create({
+        key: 'poacherright',
+        frames: this.anims.generateFrameNumbers('poacher', {start: 144, end: 151}),
+        frameRate: 10,
+        repeat: -1
+    })
 
 
 
@@ -202,16 +237,16 @@ gamescene.create = function(){
         {
         	if(tree.active==true)
         	{
-	            cutters[i].stop()
+               cutters[i].stop()
 	            // cutterobj.anims.pause()
 	            cutters[i].iscutting = true;
 	            cutters[i].startcutting()
 	        }
         }
-    	this.physics.add.collider(cutters[i].obj, fox, eatcutter, null, this);
-    	function eatcutter(cutterobj, fox){
+        this.physics.add.collider(cutters[i].obj, fox, eatcutter, null, this);
+        function eatcutter(cutterobj, fox){
 
-    	}
+        }
     }
 }
 
@@ -221,7 +256,96 @@ function selectFox(obj){
     obj.stop()
 }
 
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1)); // random index from 0 to i
+        [array[i], array[j]] = [array[j], array[i]];
+        return array
+    }
+}
+
 gamescene.update = function(){
+
+    d = new Date()
+    if(d.getTime() - t > 1000){
+        let arr = shuffle([1, 2, 3, 4])
+        for(var i = 0; i < 4; i++){
+            if(arr[i] == 1){
+                if(!poachertl){
+                    var y = -100
+                    var x = -100
+                    var destx = 50
+                    var desty = 50
+                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), 200, destx, desty);
+                    poachers.push(tempPoacher)
+                    num_poachers += 1
+                    poachertl = true
+                    t = d.getTime()
+                    break;
+                }
+            }
+            else if(arr[i] == 2){
+                if(!poacherbl){
+                    var y = CANVAS_H
+                    var x = -100
+                    var destx = 50
+                    var desty = CANVAS_H - 50
+                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), 200, destx, desty);
+                    poachers.push(tempPoacher)
+                    num_poachers += 1
+                    poacherbl = true
+                    t = d.getTime()
+                    break;
+                }
+            }
+            else if(arr[i] == 3){
+                if(!poacherbr){
+                    var y = CANVAS_H
+                    var x = CANVAS_W
+                    var destx = CANVAS_W - 50
+                    var desty = CANVAS_H - 50
+                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), 200, destx, desty);
+                    poachers.push(tempPoacher)
+                    num_poachers += 1
+                    poacherbr = true
+                    t = d.getTime()
+                    break;
+                }
+
+            }
+            else if(arr[i] == 4){
+                if(!poachertr){
+                    var y = -100
+                    var x = CANVAS_W
+                    var destx = CANVAS_W - 50
+                    var desty = 50
+                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), 200, destx, desty);
+                    poachers.push(tempPoacher)
+                    num_poachers += 1
+                    poachertr = true
+                    t = d.getTime()
+                    break;
+                }
+            }
+        }
+    }
+    for(var i = 0; i < num_poachers; i++){
+        poachers[i].move()
+        if(poachers[i].obj.body.velocity.x > 0){
+            poachers[i].obj.anims.play('poacherright', true)
+        }
+        else if(poachers[i].obj.body.velocity.x < 0){
+            poachers[i].obj.anims.play('poacherleft', true)
+        }
+        if(poachers[i].obj.body.velocity.y > 0){
+            poachers[i].obj.anims.play('poacherdown', true)
+        }
+        else if(poachers[i].obj.body.velocity.y < 0){
+            poachers[i].obj.anims.play('poacherup', true)
+        }
+    }
+
+    
     this.input.on('pointerup', function(event){
         if(fox.selected){
             fox.moving = true;
@@ -300,7 +424,7 @@ gamescene.update = function(){
         
         // to reduce health bar , find the index of nearest tree and reduce
         // the health of corresponding bar
-       	var rem = -1;
+        var rem = -1;
         if(cutters[i].iscutting == 1)
         {
             var a = 0;
@@ -315,12 +439,12 @@ gamescene.update = function(){
                     	{
                     		if(cutters[j].destx == tree.x && cutters[j].desty == tree.y)
                     		{
-	                        	cutters[j].iscutting = 0;
-	                        	cutters[j].cutfrom = 'no';
-	                        	cutters[j].unstopped = 1;
-                    		}
-                    	}
-                    	rem = a;
+                              cutters[j].iscutting = 0;
+                              cutters[j].cutfrom = 'no';
+                              cutters[j].unstopped = 1;
+                          }
+                      }
+                      rem = a;
                         // console.log(a,"removed");
                         trees.killAndHide(tree);
                         for(var j = a ; j < num_trees-1 ; j++)
@@ -332,8 +456,8 @@ gamescene.update = function(){
                 }
                 a = a + 1; 
             }, this);
-        	var cnt =0;
-        	trees.getChildren().forEach(function(tree)
+            var cnt =0;
+            trees.getChildren().forEach(function(tree)
             {
             	if(cnt==rem)
             	{
@@ -345,7 +469,7 @@ gamescene.update = function(){
         }
     }
     var cnt=0;
-   	trees.getChildren().forEach(function(tree)
+    trees.getChildren().forEach(function(tree)
     {
     	cnt = cnt + 1;
     }, this);
