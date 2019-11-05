@@ -1,6 +1,9 @@
 CANVAS_W = 800;
 CANVAS_H = 600;
 
+var gamescene = new Phaser.Scene("gamescene");
+var homescreen = new Phaser.Scene("homescreen");
+
 function findDis(a, b){
     var t = a.x - b.x;
     var p = a.y - b.y;
@@ -28,16 +31,11 @@ var config = {
     physics: {
         default: 'arcade',
     },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
 };
 
 var game = new Phaser.Game(config);
 
-function preload(){
+gamescene.preload = function(){
     this.load.image('sand', 'assets/sand.jpg');
     this.load.image('tree', 'assets/treenew.png');
     // this.load.image('cutter', 'assets/cutter.png');
@@ -64,7 +62,7 @@ function preload(){
 
 var num_cutters, cutters, num_trees, trees;
 	
-function create(){
+gamescene.create = function(){
     //set bg
     this.bg = this.add.image(0, 0, 'sand').setScale(4);
 
@@ -223,7 +221,7 @@ function selectFox(obj){
     obj.stop()
 }
 
-function update(){
+gamescene.update = function(){
     this.input.on('pointerup', function(event){
         if(fox.selected){
             fox.moving = true;
@@ -353,3 +351,37 @@ function update(){
     }, this);
     // console.log("cnto",cnt);
 }
+
+homescreen.preload = function(){
+
+}
+
+homescreen.create = function(){
+    this.text = this.add.text(0, 0, "Welcome to Game", {font: "40px Impact"});
+    var tween = this.tweens.add({
+        targets: this.text,
+        x: 200,
+        y: 250,
+        duration: 2000,
+        ease: "Elastic",
+        easeParams: [1.5, 0.5],
+        delay: 1000,
+        onComplete: function(src, tgt){
+            tgt[0].x = 0;
+            tgt[0].y = 0;
+            tgt[0].setColor("Red");
+        }
+    }, this);
+
+    this.key_1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
+}
+
+homescreen.update = function(){
+    if(this.key_1.isDown)
+        this.scene.start("gamescene");
+}
+
+game.scene.add('homescreen', homescreen);
+game.scene.add('gamescene', gamescene);
+
+game.scene.start('homescreen');
