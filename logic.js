@@ -1,5 +1,5 @@
-CANVAS_W = 800;
-CANVAS_H = 600;
+CANVAS_W = 1200;
+CANVAS_H = 650;
 
 var gamescene = new Phaser.Scene("gamescene");
 var homescreen = new Phaser.Scene("homescreen");
@@ -59,6 +59,9 @@ gamescene.preload = function(){
         frameWidth: 64, frameHeight: 64
     });
     this.load.spritesheet('poacher', 'assets/poacher.png', {
+        frameWidth: 64 , frameHeight: 64
+    });
+    this.load.spritesheet('crosshair', 'assets/crosshair.png', {
         frameWidth: 64 , frameHeight: 64
     });
 }
@@ -233,6 +236,13 @@ gamescene.create = function(){
         frameRate: 10,
         repeat: -1
     })
+    this.anims.create({
+        key: 'poacherstand',
+        frames: this.anims.generateFrameNumbers('poacher', {start: 27, end: 27}),
+        frameRate: 10,
+        repeat: -1
+    })
+
 
 
 
@@ -280,7 +290,7 @@ gamescene.update = function(){
                     var x = -100
                     var destx = 50
                     var desty = 50
-                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), 200, destx, desty);
+                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 1);
                     poachers.push(tempPoacher)
                     num_poachers += 1
                     poachertl = true
@@ -294,7 +304,7 @@ gamescene.update = function(){
                     var x = -100
                     var destx = 50
                     var desty = CANVAS_H - 50
-                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), 200, destx, desty);
+                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 2);
                     poachers.push(tempPoacher)
                     num_poachers += 1
                     poacherbl = true
@@ -308,7 +318,7 @@ gamescene.update = function(){
                     var x = CANVAS_W
                     var destx = CANVAS_W - 50
                     var desty = CANVAS_H - 50
-                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), 200, destx, desty);
+                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 3);
                     poachers.push(tempPoacher)
                     num_poachers += 1
                     poacherbr = true
@@ -323,7 +333,7 @@ gamescene.update = function(){
                     var x = CANVAS_W
                     var destx = CANVAS_W - 50
                     var desty = 50
-                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), 200, destx, desty);
+                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 4);
                     poachers.push(tempPoacher)
                     num_poachers += 1
                     poachertr = true
@@ -334,7 +344,21 @@ gamescene.update = function(){
         }
     }
     for(var i = 0; i < num_poachers; i++){
+        if(poachers[i].shooting == -1){
+            minimum = 100000
+            for(var q = 0; q < num_foxes; q++){
+                tempDis = findDis(poachers[i].obj, fox[q].obj)
+                if(tempDis < minimum){
+                    minimum = tempDis
+                    ind = q;
+                }
+            }
+            poachers[i].lockTarget(fox[ind])
+        }
         poachers[i].move()
+        if(poachers[i].obj.body.velocity.x == 0 && poachers[i].obj.body.velocity.y == 0){
+            poachers[i].obj.anims.play('poacherstand', true)
+        }
         if(poachers[i].obj.body.velocity.x > 0){
             poachers[i].obj.anims.play('poacherright', true)
         }
@@ -509,7 +533,7 @@ gamescene.update = function(){
         	var dx=(cutters[id].obj.x-fox[i].obj.x);
         	var dy=(cutters[id].obj.y-fox[i].obj.y);
         	var d = (dx*dx+dy*dy);
-        	console.log(d);
+        	// console.log(d);
         	if(d < 8000)
         	{
     			cutters[id].reduce();

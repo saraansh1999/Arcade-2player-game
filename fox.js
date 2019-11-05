@@ -11,8 +11,12 @@ class Fox{
         this.desty = -1;
         this.vel = vel;
         this.cutter = -1;
+        this.health = 100
     }
-    
+    hit(){
+    	this.health -= 10
+    	console.log("HIT", this.health)
+    }
     clip(c){
 		if(c == 'x'){
 			if(Math.abs(this.destx - this.obj.x) < this.vel/20)
