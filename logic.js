@@ -450,6 +450,23 @@ gamescene.update = function(){
         }
     }
     for(var i = 0; i < num_poachers; i++){
+        
+    	if(poachers[i].shooting >= 0 && poachers[i].crosshair.alpha >= 1){
+        	f = 0
+        	for(let j = 0; j < num_foxes; j++){
+        		if(findDis(poachers[i].crosshair, fox[j].obj) < poachers[i].blastRadius){
+        			fox[j].hit()
+        			f++;
+        		}
+        	}
+        	if(f > 0){
+        		poachers[i].shoot(1)
+        	}
+        	else{
+        		poachers[i].shoot(0)
+        	}
+        }
+
         if(poachers[i].shooting == -1){
             minimum = 100000
             for(var q = 0; q < num_foxes; q++){
