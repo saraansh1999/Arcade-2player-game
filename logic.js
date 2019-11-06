@@ -556,32 +556,43 @@ gamescene.update = function(){
 }
 
 homescreen.preload = function(){
-
+    this.load.image('button_arcade', 'assets/button_arcade.png');
+    this.load.image('button_timeless', 'assets/button_timeless.png');
+    this.load.image('button_title', 'assets/button_feral-retaliation.png');
 }
 
 homescreen.create = function(){
-    this.text = this.add.text(0, 0, "Welcome to Game", {font: "40px Impact"});
+    // this.text = this.add.text(0, 0, "Welcome to Game", {font: "40px Impact"});
+    
+    this.title = this.add.image(600, 100, 'button_title');
+    this.arcade_button = this.add.image(1300, 1300, 'button_arcade');
+    this.timeless_button = this.add.image(-100, -100, 'button_timeless');    
+    this.arcade_button.setInteractive({ useHandCursor: true });
+    this.timeless_button.setInteractive({ useHandCursor: true });
+
     var tween = this.tweens.add({
-        targets: this.text,
-        x: 200,
-        y: 250,
-        duration: 2000,
+        targets: this.arcade_button,
+        x: 600,
+        y: 280,
+        duration: 3000,
         ease: "Elastic",
         easeParams: [1.5, 0.5],
-        delay: 1000,
-        onComplete: function(src, tgt){
-            tgt[0].x = 0;
-            tgt[0].y = 0;
-            tgt[0].setColor("Red");
-        }
     }, this);
 
-    this.key_1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
+    tween = this.tweens.add({
+        targets: this.timeless_button,
+        x: 600,
+        y: 380,
+        duration: 3000,
+        ease: "Elastic",
+        easeParams: [1.5, 0.5],
+    }, this);
+
+    this.arcade_button.on('pointerdown', () => {this.scene.start("gamescene");} );
+    this.timeless_button.on('pointerdown', () => {this.scene.start("gamescene");} );
 }
 
 homescreen.update = function(){
-    if(this.key_1.isDown)
-        this.scene.start("gamescene");
 }
 
 game.scene.add('homescreen', homescreen);
