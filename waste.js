@@ -35,5 +35,6 @@ class Waste
 		this.obj.y = this.starty;
 		this.inBin = 0;
 		this.obj.visible = 1;
+		this.isPicked = 0
 	}
 }

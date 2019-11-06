@@ -14,6 +14,10 @@ class Poacher{
 	lockTarget(fox){
 		this.target = fox;
 	}
+	die(){
+		this.obj.destroy()
+		this.crosshair.destroy()
+	}
 	clip(obj, dx, dy, vel){
 		if(Math.abs(dx - obj.x) < vel/10){
 			obj.setVelocityX(1*Math.sign(dx - obj.x))

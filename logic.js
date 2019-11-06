@@ -350,6 +350,26 @@ function shuffle(array) {
     }
 }
 
+function killPoacher(poacher){
+	if(poacher.type == 1)
+		poachertl = false
+	else if(poacher.type == 2)
+		poacherbl = false
+	else if(poacher.type == 3)
+		poacherbr = false
+	else
+		poachertr = false
+
+	poacher.die()
+	for(var i = 0; i < num_poachers; i++){
+		if(poachers[i] == poacher){
+			poachers.splice(i, 1)
+			break
+		}
+	}
+	num_poachers -= 1
+}
+
 gamescene.update = function(){
 
 
@@ -387,7 +407,7 @@ gamescene.update = function(){
     /////////////////////////////////////////
 
     d = new Date()
-    if(d.getTime() - t > 1000){
+    if(d.getTime() - t > 5000){
         let arr = shuffle([1, 2, 3, 4])
         for(var i = 0; i < 4; i++){
             if(arr[i] == 1){
@@ -400,7 +420,6 @@ gamescene.update = function(){
                     poachers.push(tempPoacher)
                     num_poachers += 1
                     poachertl = true
-                    t = d.getTime()
                     break;
                 }
             }
@@ -414,7 +433,6 @@ gamescene.update = function(){
                     poachers.push(tempPoacher)
                     num_poachers += 1
                     poacherbl = true
-                    t = d.getTime()
                     break;
                 }
             }
@@ -428,7 +446,6 @@ gamescene.update = function(){
                     poachers.push(tempPoacher)
                     num_poachers += 1
                     poacherbr = true
-                    t = d.getTime()
                     break;
                 }
 
@@ -443,10 +460,10 @@ gamescene.update = function(){
                     poachers.push(tempPoacher)
                     num_poachers += 1
                     poachertr = true
-                    t = d.getTime()
                     break;
                 }
             }
+            t = d.getTime()
         }
     }
     for(var i = 0; i < num_poachers; i++){
@@ -685,11 +702,32 @@ gamescene.update = function(){
             scientist.obj.y = 300;
             timer.start = 1;
             waste_cnt = 0;
+            scientist.setOpp(poachers[i])
         }        
     }
 
 
     // GAME1 /////////////////////////////////////
+    if(waste_cnt == num_wastes && timer.health > 0)
+    {
+        waste_cnt = 0;
+        for(var i =0 ; i < num_wastes ;i++)
+        {
+            waste[i].reset();
+        }
+        scientist.reset(1);
+        killPoacher(scientist.opponent)
+        timer.reset();  
+    }
+    else if(timer.health <= 0){
+    	waste_cnt = 0;
+        for(var i =0 ; i < num_wastes ;i++)
+        {
+            waste[i].reset();
+        }
+        scientist.reset(0);
+        timer.reset();  
+    }
     for (var i =0 ;i < num_wastes ; i++)
     {
         if(waste[i].inBin == 0)
@@ -720,16 +758,6 @@ gamescene.update = function(){
             waste[id].obj.visible = false   ;
             waste_cnt += 1;
         }
-    }
-    if(waste_cnt == num_wastes)
-    {
-        waste_cnt = 0;
-        for(var i =0 ; i < num_wastes ;i++)
-        {
-            waste[i].reset();
-        }
-        scientist.reset();
-        timer.reset();  
     }
     if(timer.start == 1)
     {
