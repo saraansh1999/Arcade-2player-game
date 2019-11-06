@@ -556,14 +556,14 @@ gamescene.update = function(){
 }
 
 homescreen.preload = function(){
+    this.load.image('bg', 'assets/bg.jpg');
     this.load.image('button_arcade', 'assets/button_arcade.png');
     this.load.image('button_timeless', 'assets/button_timeless.png');
     this.load.image('button_title', 'assets/button_feral-retaliation.png');
 }
 
 homescreen.create = function(){
-    // this.text = this.add.text(0, 0, "Welcome to Game", {font: "40px Impact"});
-    
+    this.bg = this.add.image(600, 325, 'bg').setScale(1.4);    
     this.title = this.add.image(600, 100, 'button_title');
     this.arcade_button = this.add.image(1300, 1300, 'button_arcade');
     this.timeless_button = this.add.image(-100, -100, 'button_timeless');    
