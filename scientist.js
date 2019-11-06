@@ -5,6 +5,9 @@ class Scientist
 	{
 		this.obj = obj
 		this.curWaste = -1;
+		this.health = 100;
+		this.startx = obj.x;
+		this.starty = obj.x;
 	}
 	
 	reduce()
@@ -13,5 +16,10 @@ class Scientist
 		{
 			this.health -= 1;
 		}
+	}
+	reset()
+	{
+		this.obj.x = this.startx;
+		this.obj.y = this.starty;
 	}
 }

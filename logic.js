@@ -80,6 +80,7 @@ gamescene.preload = function(){
 
 var num_cutters, cutters, num_trees, trees, poachers, poachertl=false, poachertr=false, poacherbl=false, poacherbr=false;;
 var num_foxes ;
+var waste_cnt;
 var d = new Date()
 var t = d.getTime()
 
@@ -137,7 +138,7 @@ gamescene.create = function(){
     poachers = []
 
     //create scientist
-    scientist = new Scientist(this.physics.add.sprite(600, 300, 'scientist'));
+    scientist = new Scientist(this.physics.add.sprite(400, 300, 'scientist'));
     seperators = this.physics.add.staticGroup();
     seperators.create(900,230,'seperator').setScale(2).refreshBody();
     seperators.create(1390,230,'seperator').setScale(2).refreshBody();
@@ -160,7 +161,8 @@ gamescene.create = function(){
     temp=new Waste(this.add.image(1200,150,'banana').setScale(0.1),'organic',1160-b,1160+b,600-a,600+a);
     waste.push(temp);
 
-
+    timer=new Timer(this.add.image(1146,50,'healthBar'));
+    timer.obj.scaleX= 5;
     /////////////////////////////////////////////////////
 
     //animations
@@ -664,6 +666,8 @@ gamescene.update = function(){
         {
             scientist.obj.x = 1200;
             scientist.obj.y = 300;
+            timer.start = 1;
+            waste_cnt = 0;
         }        
     }
 
@@ -697,10 +701,23 @@ gamescene.update = function(){
             waste[id].inBin = 1;
             waste[id].isPicked = 0;
             waste[id].obj.visible = false   ;
+            waste_cnt += 1;
         }
     }
-    
-
+    if(waste_cnt == num_wastes)
+    {
+        waste_cnt = 0;
+        for(var i =0 ; i < num_wastes ;i++)
+        {
+            waste[i].reset();
+        }
+        scientist.reset();
+        timer.reset();  
+    }
+    if(timer.start == 1)
+    {
+        timer.reduce();
+    }
 
     //////////////////////////////////////////////
 }

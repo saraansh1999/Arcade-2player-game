@@ -11,6 +11,8 @@ class Waste
 		this.ux = ux;
 		this.ly = ly;
 		this.uy = uy;
+		this.startx = obj.x;
+		this.starty = obj.y;
 	}
 	
 	check()
@@ -25,5 +27,13 @@ class Waste
 			}
 		}
 		return 0;
+	}
+
+	reset()
+	{
+		this.obj.x = this.startx;
+		this.obj.y = this.starty;
+		this.inBin = 0;
+		this.obj.visible = 1;
 	}
 }
