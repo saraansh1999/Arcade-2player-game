@@ -1,5 +1,5 @@
-CANVAS_W = 1200;
-CANVAS_H = 650;
+CANVAS_W = 800;
+CANVAS_H = 600;
 
 var gamescene = new Phaser.Scene("gamescene");
 var homescreen = new Phaser.Scene("homescreen");
@@ -26,8 +26,8 @@ function getClosest(trees, cutter){
 
 var config = {
     type: Phaser.AUTO,
-    width: CANVAS_W,
-    height: CANVAS_H,
+    width: CANVAS_W+600,
+    height: CANVAS_H+110,
     physics: {
         default: 'arcade',
     },
@@ -37,9 +37,17 @@ var game = new Phaser.Game(config);
 
 gamescene.preload = function(){
     this.load.image('sand', 'assets/sand.jpg');
+    this.load.image('sky', 'assets/sky.png');
     this.load.image('tree', 'assets/treenew.png');
-    // this.load.image('cutter', 'assets/cutter.png');
     this.load.image('healthBar', 'assets/lifebar.png');
+    this.load.image('seperator', 'assets/seperator.png');
+    this.load.image('plasticBin', 'assets/plastic.png');
+    this.load.image('organicBin', 'assets/organic.png');
+    this.load.image('paperBin', 'assets/paper.png');
+    this.load.image('paperball', 'assets/paperwaste.png');
+    this.load.image('bottle', 'assets/bottlewaste.png');
+    this.load.image('banana', 'assets/bananawaste.png');
+    
     this.load.spritesheet('cutter', 'assets/cutter_sprites.png', 
         {frameWidth: 64, frameHeight: 64}
         );
@@ -64,9 +72,14 @@ gamescene.preload = function(){
     this.load.spritesheet('crosshair', 'assets/crosshair.png', {
         frameWidth: 64 , frameHeight: 64
     });
+    this.load.spritesheet('scientist', 'assets/scientist.png', {
+        frameWidth: 64 , frameHeight: 64
+    });
+
 }
 
 var num_cutters, cutters, num_trees, trees, poachers, poachertl=false, poachertr=false, poacherbl=false, poacherbr=false;;
+var num_foxes ;
 var d = new Date()
 var t = d.getTime()
 
@@ -74,7 +87,8 @@ var t = d.getTime()
 gamescene.create = function(){
     //set bg
     this.bg = this.add.image(0, 0, 'sand').setScale(4);
-
+    sk = this.add.image(1170, 400, 'sky');
+    sk.setDisplaySize(550,900);
     //create woodcutter
     num_cutters = 4
     var a =50;
@@ -122,6 +136,32 @@ gamescene.create = function(){
     num_poachers = 0
     poachers = []
 
+    //create scientist
+    scientist = new Scientist(this.physics.add.sprite(1200, 300, 'scientist'));
+    seperators = this.physics.add.staticGroup();
+    seperators.create(900,230,'seperator').setScale(2).refreshBody();
+    seperators.create(1390,230,'seperator').setScale(2).refreshBody();
+    this.physics.add.collider(scientist.obj, seperators);
+
+    ///GAME1 //////////////////////////////////////
+    bins = [];      
+    bins.push(this.add.image(1000,600,'plasticBin').setScale(0.4));
+    bins.push(this.add.image(1160,600,'organicBin').setScale(0.4));
+    bins.push(this.add.image(1295,600,'paperBin').setScale(0.4));
+
+    waste = [] ;
+    num_wastes = 3 ;
+    var a = 45;
+    var b = 50;
+    temp=new Waste(this.add.image(1000,150,'paperball').setScale(0.1),'paper',1295-b,1295+b,600-a,600+a);
+    waste.push(temp);
+    temp=new Waste(this.add.image(1100,150,'bottle').setScale(0.15),'plastic',1000-b,1000+b,600-a,600+a);
+    waste.push(temp);
+    temp=new Waste(this.add.image(1200,150,'banana').setScale(0.1),'organic',1160-b,1160+b,600-a,600+a);
+    waste.push(temp);
+
+
+    /////////////////////////////////////////////////////
 
     //animations
     this.anims.create({
@@ -243,8 +283,38 @@ gamescene.create = function(){
         repeat: -1
     })
 
+    this.anims.create({
+        key: 'scientistup',
+        frames: this.anims.generateFrameNumbers('scientist', {start: 13, end: 16}),
+        frameRate: 10,
+        repeat: -1
+    })
+    this.anims.create({
+        key: 'scientistdown',
+        frames: this.anims.generateFrameNumbers('scientist', {start: 0, end: 3}),
+        frameRate: 10,
+        repeat: -1
+    })
+    this.anims.create({
+        key: 'scientistleft',
+        frames: this.anims.generateFrameNumbers('scientist', {start: 4, end: 7}),
+        frameRate: 10,
+        repeat: -1
+    })
+    this.anims.create({
+        key: 'scientistright',
+        frames: this.anims.generateFrameNumbers('scientist', {start: 8, end: 11}),
+        frameRate: 10,
+        repeat: -1
+    })
+    this.anims.create({
+        key: 'scientistturn',
+        frames: this.anims.generateFrameNumbers('scientist', {start: 0, end: 0}),
+        frameRate: 10,
+        repeat: -1
+    })
 
-
+    cursors = this.input.keyboard.createCursorKeys();
 
     collider_tree_cutter = [];
     //collisions
@@ -279,6 +349,40 @@ function shuffle(array) {
 }
 
 gamescene.update = function(){
+
+
+    //scientist movements/////////////////
+    if (cursors.left.isDown)
+    {
+        scientist.obj.setVelocityX(-330);
+        scientist.obj.setVelocityY(0);
+        scientist.obj.anims.play('scientistleft', true);
+    }
+    else if (cursors.right.isDown)
+    {
+        scientist.obj.setVelocityX(330);
+        scientist.obj.setVelocityY(0);
+        scientist.obj.anims.play('scientistright', true);
+    }
+    else if (cursors.up.isDown)
+    {
+        scientist.obj.setVelocityY(-330);
+        scientist.obj.setVelocityX(0);
+        scientist.obj.anims.play('scientistup', true);
+    }
+    else if (cursors.down.isDown)
+    {
+        scientist.obj.setVelocityY(330);
+        scientist.obj.setVelocityX(0);
+        scientist.obj.anims.play('scientistdown', true);
+    }
+    else
+    {
+        scientist.obj.setVelocityX(0);
+        scientist.obj.setVelocityY(0);
+        scientist.obj.anims.play('scientistturn');
+    }
+    /////////////////////////////////////////
 
     d = new Date()
     if(d.getTime() - t > 1000){
@@ -553,6 +657,42 @@ gamescene.update = function(){
         	}
     	}
     }
+
+    // GAME1 /////////////////////////////////////
+    for (var i =0 ;i < num_wastes ; i++)
+    {
+        if(waste[i].inBin == 0)
+        {
+            if(scientist.curWaste == -1)
+            {
+                var dx=(waste[i].obj.x-scientist.obj.x);
+                var dy=(waste[i].obj.y-scientist.obj.y);
+                var d = (dx*dx+dy*dy);     
+                if(d < 3000)
+                {
+                    waste[i].isPicked  = 1;
+                    scientist.curWaste = i;
+                }
+            }
+        }
+    }
+    if(scientist.curWaste != -1)
+    {
+        id = scientist.curWaste;
+        waste[id].obj.x = scientist.obj.x;
+        waste[id].obj.y = scientist.obj.y-40;
+        if(waste[id].check()==1)
+        {
+            scientist.curWaste = -1;
+            waste[id].inBin = 1;
+            waste[id].isPicked = 0;
+        }
+        // console.log(waste[id].obj.x,waste[id].obj.y);
+    }
+    
+
+
+    //////////////////////////////////////////////
 }
 
 homescreen.preload = function(){
