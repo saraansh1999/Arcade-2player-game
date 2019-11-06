@@ -137,7 +137,7 @@ gamescene.create = function(){
     poachers = []
 
     //create scientist
-    scientist = new Scientist(this.physics.add.sprite(1200, 300, 'scientist'));
+    scientist = new Scientist(this.physics.add.sprite(600, 300, 'scientist'));
     seperators = this.physics.add.staticGroup();
     seperators.create(900,230,'seperator').setScale(2).refreshBody();
     seperators.create(1390,230,'seperator').setScale(2).refreshBody();
@@ -588,7 +588,6 @@ gamescene.update = function(){
 	                    		}
 	                    	}
 	                    	rem = a;
-	                        // console.log(a,"removed");
 	                        trees.killAndHide(tree);
 	                        for(var j = a ; j < num_trees-1 ; j++)
 	                        {
@@ -627,7 +626,6 @@ gamescene.update = function(){
     	   			fox[i].cutter = j;
     	   			break;
     	    	}
-    	    	// console.log(i,dx,dy,d);
     	    }
     	}
 
@@ -637,7 +635,6 @@ gamescene.update = function(){
         	var dx=(cutters[id].obj.x-fox[i].obj.x);
         	var dy=(cutters[id].obj.y-fox[i].obj.y);
         	var d = (dx*dx+dy*dy);
-        	// console.log(d);
         	if(d < 8000)
         	{
     			cutters[id].reduce();
@@ -657,6 +654,19 @@ gamescene.update = function(){
         	}
     	}
     }
+    //scientist poacher interaction
+    for(var i =0 ;  i < num_poachers ; i++)
+    {
+        var dx=(poachers[i].obj.x-scientist.obj.x);
+        var dy=(poachers[i].obj.y-scientist.obj.y);
+        var d = (dx*dx+dy*dy);
+        if(d<4000)
+        {
+            scientist.obj.x = 1200;
+            scientist.obj.y = 300;
+        }        
+    }
+
 
     // GAME1 /////////////////////////////////////
     for (var i =0 ;i < num_wastes ; i++)
@@ -686,9 +696,8 @@ gamescene.update = function(){
             scientist.curWaste = -1;
             waste[id].inBin = 1;
             waste[id].isPicked = 0;
-            waste[id].obj.visible = false;
+            waste[id].obj.visible = false   ;
         }
-        // console.log(waste[id].obj.x,waste[id].obj.y);
     }
     
 
