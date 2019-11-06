@@ -686,6 +686,7 @@ gamescene.update = function(){
             scientist.curWaste = -1;
             waste[id].inBin = 1;
             waste[id].isPicked = 0;
+            waste[id].obj.visible = false;
         }
         // console.log(waste[id].obj.x,waste[id].obj.y);
     }
