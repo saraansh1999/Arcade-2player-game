@@ -8,8 +8,19 @@ class Timer
 
 	reduce()
 	{
-		if(this.health-0.01 > 0)
-			this.health = this.health - 0.005;
+		var a = 0.003
+		if(this.health-a > 0)
+			this.health = this.health - a;
+		else
+			this.health = 0;
+
+		this.obj.scaleX = this.health;
+	}
+	bigreduce()
+	{
+		var a = 0.3;
+		if(this.health-a > 0)
+			this.health = this.health - a;
 		else
 			this.health = 0;
 

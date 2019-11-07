@@ -36,7 +36,7 @@ var config = {
 var game = new Phaser.Game(config);
 
 gamescene.preload = function(){
-    this.load.image('sand', 'assets/sand.jpg');
+    this.load.image('sand', 'assets/sand2.jpg');
     this.load.image('sky', 'assets/sky.png');
     this.load.image('tree', 'assets/treenew.png');
     this.load.image('healthBar', 'assets/lifebar.png');
@@ -44,9 +44,15 @@ gamescene.preload = function(){
     this.load.image('plasticBin', 'assets/plastic.png');
     this.load.image('organicBin', 'assets/organic.png');
     this.load.image('paperBin', 'assets/paper.png');
+    this.load.image('polythene', 'assets/polythene.png');
     this.load.image('paperball', 'assets/paperwaste.png');
-    this.load.image('bottle', 'assets/bottlewaste.png');
+    this.load.image('bottle1', 'assets/bottle1.png');
+    this.load.image('bottle2', 'assets/bottle2.png');
     this.load.image('banana', 'assets/bananawaste.png');
+    this.load.image('cardboard', 'assets/cardboard_waste.png');
+    this.load.image('apple', 'assets/apple_waste.png');
+    this.load.image('organic', 'assets/organic_waste.png');
+    
     
     this.load.spritesheet('cutter', 'assets/cutter_sprites.png', 
         {frameWidth: 64, frameHeight: 64}
@@ -80,6 +86,7 @@ gamescene.preload = function(){
 
 var num_cutters, cutters, num_trees, trees, poachers, poachertl=false, poachertr=false, poacherbl=false, poacherbr=false;;
 var num_foxes ;
+var num_bins ;
 var waste_cnt;
 var d = new Date()
 var t = d.getTime()
@@ -145,21 +152,38 @@ gamescene.create = function(){
     this.physics.add.collider(scientist.obj, seperators);
 
     ///GAME1 //////////////////////////////////////
-    bins = [];      
-    bins.push(this.add.image(1000,600,'plasticBin').setScale(0.4));
-    bins.push(this.add.image(1160,600,'organicBin').setScale(0.4));
-    bins.push(this.add.image(1295,600,'paperBin').setScale(0.4));
-
-    waste = [] ;
-    num_wastes = 3 ;
+    num_bins = 3;
     var a = 45;
     var b = 50;
-    temp=new Waste(this.add.image(1000,150,'paperball').setScale(0.1),'paper',1295-b,1295+b,600-a,600+a);
+    bins = [];      
+    bins.push( new Bin(this.add.image(1000,600,'plasticBin').setScale(0.4),'plastic', 1000-b,1000+b,600-a,600+a));
+    bins.push( new Bin(this.add.image(1160,600,'organicBin').setScale(0.4),'organic', 1160-b,1160+b,600-a,600+a));
+    bins.push( new Bin(this.add.image(1295,600,'paperBin').setScale(0.4),'paper',1295-b,1295+b,600-a,600+a));
+
+
+    waste = [] ;
+    num_wastes = 8 ;
+   
+    temp=new Waste(this.add.image(1000,150,'paperball').setScale(0.1),'paper');
     waste.push(temp);
-    temp=new Waste(this.add.image(1100,150,'bottle').setScale(0.15),'plastic',1000-b,1000+b,600-a,600+a);
+    temp=new Waste(this.add.image(1100,150,'bottle1').setScale(0.15),'plastic');
     waste.push(temp);
-    temp=new Waste(this.add.image(1200,150,'banana').setScale(0.1),'organic',1160-b,1160+b,600-a,600+a);
+    temp=new Waste(this.add.image(1300,150,'bottle2').setScale(0.15),'plastic');
     waste.push(temp);
+    temp=new Waste(this.add.image(1200,150,'banana').setScale(0.1),'organic');
+    waste.push(temp);
+    temp=new Waste(this.add.image(1000, 250,'polythene').setScale(0.2),'plastic');
+    waste.push(temp);
+    temp=new Waste(this.add.image(1100, 250,'cardboard').setScale(0.3),'paper');
+    waste.push(temp);
+    temp=new Waste(this.add.image(1200, 250,'apple').setScale(0.05),'organic');
+    waste.push(temp);
+    temp=new Waste(this.add.image(1300, 250,'organic').setScale(0.15),'organic');
+    waste.push(temp);
+
+    // for(var i = 0; i < num_wastes; i++){
+    //     waste[i].obj.visible = 0;
+    // }                                                           
 
     timer=new Timer(this.add.image(1146,50,'healthBar'));
     timer.obj.scaleX= 5;
@@ -750,13 +774,34 @@ gamescene.update = function(){
         id = scientist.curWaste;
         waste[id].obj.x = scientist.obj.x;
         waste[id].obj.y = scientist.obj.y-40;
-        if(waste[id].check()==1)
+        x=waste[id].obj.x;
+        y=waste[id].obj.y;
+        for(var i = 0 ; i < num_bins ; i++)
         {
-            scientist.curWaste = -1;
-            waste[id].inBin = 1;
-            waste[id].isPicked = 0;
-            waste[id].obj.visible = false   ;
-            waste_cnt += 1;
+            if(scientist.curWaste != -1)
+            {
+                if(bins[i].check(x,y)==1)
+                {
+                    console.log(x,y);
+                    if(waste[id].type==bins[i].type)
+                    {
+                        scientist.curWaste = -1;
+                        waste[id].inBin = 1;
+                        waste[id].isPicked = 0;
+                        waste[id].obj.visible = false   ;
+                        waste_cnt += 1;
+                    }
+                    else
+                    {
+                        scientist.curWaste = -1;
+                        waste[id].inBin = 1;
+                        waste[id].isPicked = 0;
+                        waste[id].obj.visible = false   ;
+                        waste_cnt += 1;
+                        timer.bigreduce();
+                    }
+                }
+            }
         }
     }
     if(timer.start == 1)
@@ -775,8 +820,8 @@ homescreen.preload = function(){
 }
 
 homescreen.create = function(){
-    this.bg = this.add.image(600, 325, 'bg').setScale(1.4);    
-    this.title = this.add.image(600, 100, 'button_title');
+    this.bg = this.add.image(700, 325, 'bg').setScale(1.6);    
+    this.title = this.add.image(700, 100, 'button_title');
     this.arcade_button = this.add.image(1300, 1300, 'button_arcade');
     this.timeless_button = this.add.image(-100, -100, 'button_timeless');    
     this.arcade_button.setInteractive({ useHandCursor: true });
@@ -784,8 +829,8 @@ homescreen.create = function(){
 
     var tween = this.tweens.add({
         targets: this.arcade_button,
-        x: 600,
-        y: 280,
+        x: 700,
+        y: 320,
         duration: 3000,
         ease: "Elastic",
         easeParams: [1.5, 0.5],
@@ -793,8 +838,8 @@ homescreen.create = function(){
 
     tween = this.tweens.add({
         targets: this.timeless_button,
-        x: 600,
-        y: 380,
+        x: 700,
+        y: 420,
         duration: 3000,
         ease: "Elastic",
         easeParams: [1.5, 0.5],
@@ -810,4 +855,5 @@ homescreen.update = function(){
 game.scene.add('homescreen', homescreen);
 game.scene.add('gamescene', gamescene);
 
-game.scene.start('homescreen');
+// game.scene.start('homescreen');
+game.scene.start('gamescene');
