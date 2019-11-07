@@ -76,6 +76,16 @@ class Cutter{
 				this.cutfrom = 'left'
 			}	
 		}
+		// this.cutSound.play({
+		// 	loop: true,
+		// 	rate: 2
+		// })
+	}
+	stopCutting(){
+		this.iscutting = 0;
+		// this.cutSound.pause()
+		this.cutfrom = 'no';
+		this.unstopped = true;
 	}
 	reduce()
 	{

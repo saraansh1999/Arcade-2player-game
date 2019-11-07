@@ -10,6 +10,7 @@ class Poacher{
 		this.crosshair.alpha = 0.1
 		this.shooting = -400
 		this.blastRadius = this.crosshair.displayWidth
+		this.shootSound = undefined
 	}
 	lockTarget(fox){
 		this.target = fox;
@@ -68,7 +69,7 @@ class Poacher{
 				this.crosshair.setVelocityY(this.cvel)
 			}
 			// if(this.crosshair.body.velocity.y == 0 && this.crosshair.body.velocity.x == 0)
-				this.crosshair.alpha += 0.0005
+				this.crosshair.alpha += 0.005
 			// else
 				// this.crosshair.alpha += 0.0005
 		}
