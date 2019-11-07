@@ -6,6 +6,7 @@ class Cutter{
 		this.cutfrom = 'none'
 		this.iscutting = false;
 		this.health = 100;
+		this.tint = [255, 255, 255]
 	}
 	setDest(x, y){
 		this.destx = x
@@ -92,6 +93,10 @@ class Cutter{
 		if(this.health >0)
 		{
 			this.health -= 1;
+			this.tint[0] -= 1;
+			this.tint[1] -= 2;
+			this.tint[2] -= 1;
+			this.obj.setTint((this.tint[0] * 0x010000) + (this.tint[1] * 0x000100) + (this.tint[2] * 0x000001))
 		}
 	}
 }

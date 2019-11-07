@@ -2,8 +2,10 @@ class Tree
 {
 	constructor(treeobj, healthbar){
 		this.treeobj=treeobj;
-		this.treeobj.body.width = 70
-		this.treeobj.body.height = 90
+		this.treeobj.body.width = 50
+		this.treeobj.body.height = 50
+		this.treeobj.body.displayWidth = 50
+		this.treeobj.body.displayHeight = 50
 		this.treeobj.setImmovable(true);
 		this.healthbar=healthbar;
 		this.health = 1;

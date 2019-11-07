@@ -138,6 +138,7 @@ gamescene.create = function(){
     	bar.push(tempBar);
     }
 
+
     num_foxes = 1;
     fox =  []; 
     // create fox
@@ -769,7 +770,7 @@ gamescene.update = function(){
     				fox[i].cutter = -1;
     				collider_tree_cutter[id].destroy;
     				cutters[id].setDest(20, id*50+50);
-    				cutters[id].obj.setTint(0x0000ff);
+    				// cutters[id].obj.setTint(0x0000ff);
     				cutters[id].unstopped = 1;
     				cutters[id].cutfrom = 'no';
     			}
