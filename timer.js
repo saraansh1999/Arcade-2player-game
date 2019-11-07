@@ -8,7 +8,7 @@ class Timer
 
 	reduce()
 	{
-		var a = 0.003
+		var a = 0.001
 		if(this.health-a > 0)
 			this.health = this.health - a;
 		else

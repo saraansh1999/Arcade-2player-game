@@ -434,7 +434,7 @@ gamescene.update = function(){
     /////////////////////////////////////////
 
     d = new Date()
-    if(d.getTime() - t > 5000){
+    if(d.getTime() - t > 500){
         let arr = shuffle([1, 2, 3, 4])
         for(var i = 0; i < 4; i++){
             if(arr[i] == 1){
@@ -718,6 +718,7 @@ gamescene.update = function(){
     	}
     }
     //scientist poacher interaction
+    console.log(scientist.inGame);
     if(scientist.inGame == 0)
     {
         for(var i =0 ;  i < num_poachers ; i++)
@@ -747,93 +748,96 @@ gamescene.update = function(){
     }
 
 
-    // GAME1 /////////////////////////////////////
-    if(waste_cnt == num_wastes && timer.health > 0)
+    if(scientist.inGame==1)
     {
-        waste_cnt = 0;
-        for(var i =0 ; i < num_wastes ;i++)
-        {
-            waste[i].hide();
-        }
-        for(var i=0; i< num_bins;i++)
-        {
-            bins[i].hide();
-        }
-        timer.hide();
-        scientist.reset(1);
-        killPoacher(scientist.opponent)
-    }
-    else if(timer.health <= 0){
-    	waste_cnt = 0;
-        for(var i =0 ; i < num_wastes ;i++)
-        {
-            waste[i].hide();
-        }
-        for(var i=0; i< num_bins;i++)
-        {
-            bins[i].hide();
-        }
-        timer.hide();
-        scientist.reset(0);
-    }
+        // GAME1 /////////////////////////////////////
 
-    for (var i =0 ;i < num_wastes ; i++)
-    {
-        if(waste[i].inBin == 0)
+        for (var i =0 ;i < num_wastes ; i++)
         {
-            if(scientist.curWaste == -1)
+            if(waste[i].inBin == 0)
             {
-                var dx=(waste[i].obj.x-scientist.obj.x);
-                var dy=(waste[i].obj.y-scientist.obj.y);
-                var d = (dx*dx+dy*dy);     
-                if(d < 3000)
+                if(scientist.curWaste == -1)
                 {
-                    waste[i].isPicked  = 1;
-                    scientist.curWaste = i;
-                }
-            }
-        }
-    }
-    if(scientist.curWaste != -1)
-    {
-        id = scientist.curWaste;
-        waste[id].obj.x = scientist.obj.x;
-        waste[id].obj.y = scientist.obj.y-40;
-        x=waste[id].obj.x;
-        y=waste[id].obj.y;
-        for(var i = 0 ; i < num_bins ; i++)
-        {
-            if(scientist.curWaste != -1)
-            {
-                if(bins[i].check(x,y)==1)
-                {
-                    console.log(x,y);
-                    if(waste[id].type==bins[i].type)
+                    var dx=(waste[i].obj.x-scientist.obj.x);
+                    var dy=(waste[i].obj.y-scientist.obj.y);
+                    var d = (dx*dx+dy*dy);     
+                    if(d < 3000)
                     {
-                        scientist.curWaste = -1;
-                        waste[id].inBin = 1;
-                        waste[id].isPicked = 0;
-                        waste[id].obj.visible = false   ;
-                        waste_cnt += 1;
-                    }
-                    else
-                    {
-                        scientist.curWaste = -1;
-                        waste[id].inBin = 1;
-                        waste[id].isPicked = 0;
-                        waste[id].obj.visible = false   ;
-                        waste_cnt += 1;
-                        timer.bigreduce();
+                        waste[i].isPicked  = 1;
+                        scientist.curWaste = i;
                     }
                 }
             }
         }
+        if(scientist.curWaste != -1)
+        {
+            id = scientist.curWaste;
+            waste[id].obj.x = scientist.obj.x;
+            waste[id].obj.y = scientist.obj.y-40;
+            x=waste[id].obj.x;
+            y=waste[id].obj.y;
+            for(var i = 0 ; i < num_bins ; i++)
+            {
+                if(scientist.curWaste != -1)
+                {
+                    if(bins[i].check(x,y)==1)
+                    {
+                        console.log(x,y);
+                        if(waste[id].type==bins[i].type)
+                        {
+                            scientist.curWaste = -1;
+                            waste[id].inBin = 1;
+                            waste[id].isPicked = 0;
+                            waste[id].obj.visible = false   ;
+                            waste_cnt += 1;
+                        }
+                        else
+                        {
+                            scientist.curWaste = -1;
+                            waste[id].inBin = 1;
+                            waste[id].isPicked = 0;
+                            waste[id].obj.visible = false   ;
+                            waste_cnt += 1;
+                            timer.bigreduce();
+                        }
+                    }
+                }
+            }
+        }
+       
+        if(waste_cnt == num_wastes && timer.health > 0)
+        {
+            waste_cnt = 0;
+            for(var i =0 ; i < num_wastes ;i++)
+            {
+                waste[i].hide();
+            }
+            for(var i=0; i< num_bins;i++)
+            {
+                bins[i].hide();
+            }
+            timer.hide();
+            scientist.reset(1);
+            killPoacher(scientist.opponent)
+        }
+        else if(timer.health <= 0){
+        	waste_cnt = 0;
+            for(var i =0 ; i < num_wastes ;i++)
+            {
+                waste[i].hide();
+            }
+            for(var i=0; i< num_bins;i++)
+            {
+                bins[i].hide();
+            }
+            timer.hide();
+            scientist.reset(0);
+        }
+        if(timer.start == 1)
+        {
+            timer.reduce();
+        }
     }
-    if(timer.start == 1)
-    {
-        timer.reduce();
-    }
-
     //////////////////////////////////////////////
 }
 

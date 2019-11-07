@@ -19,6 +19,7 @@ class Scientist
 	reset(sucess)
 	{
 		this.curWaste = -1	
+		this.inGame = 0;
 		if(sucess){
 			this.obj.x = this.opponent.obj.x;
 			this.obj.y = this.opponent.obj.y;
