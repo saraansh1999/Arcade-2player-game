@@ -8,12 +8,13 @@ class Scientist
 		this.health = 100;
 		this.startx = obj.x;
 		this.starty = obj.y;
+		this.inGame = 0;	
 	}
 	
 	hurt()
 	{
 		this.health -= 20;
-		console.log("Scientist hurt", this.health)
+		// console.log("Scientist hurt", this.health)
 	}
 	reset(sucess)
 	{

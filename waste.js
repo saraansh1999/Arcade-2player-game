@@ -33,4 +33,9 @@ class Waste
 		this.obj.visible = 1;
 		this.isPicked = 0
 	}
+
+	hide()
+	{
+		this.obj.visible = 0;
+	}
 }

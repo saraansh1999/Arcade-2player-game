@@ -181,12 +181,15 @@ gamescene.create = function(){
     temp=new Waste(this.add.image(1300, 250,'organic').setScale(0.15),'organic');
     waste.push(temp);
 
-    // for(var i = 0; i < num_wastes; i++){
-    //     waste[i].obj.visible = 0;
-    // }                                                           
-
     timer=new Timer(this.add.image(1146,50,'healthBar'));
     timer.obj.scaleX= 5;
+
+    for(var i = 0; i < num_wastes; i++){
+        waste[i].obj.visible = 0;
+        if(i<num_bins)
+            bins[i].obj.visible = 0;
+    }                                                           
+        timer.obj.visible = 0;
     /////////////////////////////////////////////////////
 
     //animations
@@ -715,19 +718,32 @@ gamescene.update = function(){
     	}
     }
     //scientist poacher interaction
-    for(var i =0 ;  i < num_poachers ; i++)
+    if(scientist.inGame == 0)
     {
-        var dx=(poachers[i].obj.x-scientist.obj.x);
-        var dy=(poachers[i].obj.y-scientist.obj.y);
-        var d = (dx*dx+dy*dy);
-        if(d<4000)
+        for(var i =0 ;  i < num_poachers ; i++)
         {
-            scientist.obj.x = 1200;
-            scientist.obj.y = 300;
-            timer.start = 1;
-            waste_cnt = 0;
-            scientist.setOpp(poachers[i])
-        }        
+            var dx=(poachers[i].obj.x-scientist.obj.x);
+            var dy=(poachers[i].obj.y-scientist.obj.y);
+            var d = (dx*dx+dy*dy);
+            if(d<4000)
+            {
+                scientist.obj.x = 1200;
+                scientist.obj.y = 450;
+                timer.start = 1;
+                waste_cnt = 0;
+                for(var j =0 ; j < num_wastes ; j++)
+                {
+                    waste[j].reset();
+                }
+                for(var j = 0; j <num_bins ;j++)
+                {
+                    bins[j].reset();
+                }
+                timer.reset();
+                scientist.setOpp(poachers[i])
+                scientist.inGame = 1;
+            }        
+        }
     }
 
 
@@ -737,21 +753,30 @@ gamescene.update = function(){
         waste_cnt = 0;
         for(var i =0 ; i < num_wastes ;i++)
         {
-            waste[i].reset();
+            waste[i].hide();
         }
+        for(var i=0; i< num_bins;i++)
+        {
+            bins[i].hide();
+        }
+        timer.hide();
         scientist.reset(1);
         killPoacher(scientist.opponent)
-        timer.reset();  
     }
     else if(timer.health <= 0){
     	waste_cnt = 0;
         for(var i =0 ; i < num_wastes ;i++)
         {
-            waste[i].reset();
+            waste[i].hide();
         }
+        for(var i=0; i< num_bins;i++)
+        {
+            bins[i].hide();
+        }
+        timer.hide();
         scientist.reset(0);
-        timer.reset();  
     }
+
     for (var i =0 ;i < num_wastes ; i++)
     {
         if(waste[i].inBin == 0)

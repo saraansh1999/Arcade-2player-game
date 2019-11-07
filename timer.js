@@ -30,7 +30,13 @@ class Timer
 	{
 		this.health = 4;
 		this.obj.scaleX = 4;
-		this.start = 0;
+		this.start = 1;
+		this.obj.visible= 1;
+	}
+
+	hide()
+	{
+		this.obj.visible = 0;
 	}
 	
 }

@@ -22,5 +22,15 @@ class Bin
 		}
 		return 0;
 	}
+
+	reset()
+	{
+		this.obj.visible = 1;
+	}
+
+	hide()
+	{
+		this.obj.visible = 0;
+	}
 	
 }
