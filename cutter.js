@@ -2,12 +2,14 @@ class Cutter{
 	constructor(obj, vel,active){
 		this.vel = vel
 		this.obj = obj
+		this.obj.visible = 0
 		this.unstopped = true;
 		this.cutfrom = 'none'
 		this.iscutting = false;
 		this.health = 100;
 		this.tint = [255, 255, 255]
 		this.active = active;
+		this.obj.setSize(40, 40, 20, 20)
 	}   
 	setDest(x, y){
 		this.destx = x
@@ -62,8 +64,9 @@ class Cutter{
 		this.unstopped = false;
 	}	
 	startcutting(){
-		if(Math.abs(this.obj.x - this.destx) > Math.abs(this.obj.y - this.desty)){
-			if(this.obj.x < this.destx){
+		var center = this.obj.getCenter()
+		if(Math.abs(center.x - this.destx) < Math.abs(center.y - this.desty)){
+			if(center.y < this.desty){
 				this.cutfrom = 'top'
 			}
 			else{
@@ -71,7 +74,7 @@ class Cutter{
 			}
 		}
 		else{
-			if(this.obj.y > this.desty){
+			if(center.x > this.destx){
 				this.cutfrom = 'right'
 			}
 			else{

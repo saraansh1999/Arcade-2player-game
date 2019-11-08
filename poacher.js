@@ -69,9 +69,9 @@ class Poacher{
 				this.crosshair.setVelocityY(this.cvel)
 			}
 			// if(this.crosshair.body.velocity.y == 0 && this.crosshair.body.velocity.x == 0)
-				this.crosshair.alpha += 0.005
+				// this.crosshair.alpha += 0.005
 			// else
-				// this.crosshair.alpha += 0.0005
+				this.crosshair.alpha += 0.001
 		}
 		if(this.moving){
 			this.clip(this.obj, this.destx, this.desty, this.cvel);

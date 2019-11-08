@@ -5,13 +5,12 @@ class HealthBar
 		this.health = 1;
 	}
 
-	reduce()
+	reduce(decrease=0.001)
 	{
-		if(this.health-0.01 > 0)
-			this.health = this.health - 0.001;
+		if(this.health-decrease > 0)
+			this.health = this.health - decrease;
 		else
 			this.health = 0;
-
 		this.obj.scaleX = this.health;
 	}
 	
