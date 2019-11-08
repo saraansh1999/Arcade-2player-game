@@ -161,7 +161,6 @@ gamescene.create = function(){
 	for (var i =0 ;i < num_foxes ; i++)
 	{
 		temp_fox = new Fox(this.physics.add.sprite(400, 400, 'fox'), 200);
-		temp_fox.obj.setInteractive();
 		fox.push(temp_fox);
 	}
 	this.input.keyboard.on('keyup', function(event){
@@ -465,6 +464,14 @@ gamescene.create = function(){
 	}
 }
 
+function funcFox(pointer){
+	if(fox[0].selected){
+		fox[0].moving = true;
+		fox[0].selected = false;
+		fox[0].destx = pointer.x;
+		fox[0].desty = pointer.y;
+	}
+}
 function selectFox(obj){
 	obj.stand = false;
 	obj.selected = true;
@@ -672,14 +679,7 @@ gamescene.update = function(){
 	}
 	
 	//devesh    
-	this.input.on('pointerup', function(event){
-		if(fox[0].selected){
-			fox[0].moving = true;
-			fox[0].selected = false;
-			fox[0].destx = this.input.mousePointer.x;
-			fox[0].desty = this.input.mousePointer.y;
-		}
-	}, this);
+    this.input.on('pointerup', funcFox, this);
 	
 	for(var i=0;i<num_foxes ;i++)
 	{
@@ -1029,8 +1029,8 @@ homescreen.create = function(){
 	this.title = this.add.image(700, 100, 'button_title');
 	this.arcade_button = this.add.image(1300, 1300, 'button_arcade');
 	this.timeless_button = this.add.image(-100, -100, 'button_timeless');    
-	this.arcade_button.setInteractive({ useHandCursor: true });
-	this.timeless_button.setInteractive({ useHandCursor: true });
+	this.arcade_button.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains);
+	this.timeless_button.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains);
 	
 	var tween = this.tweens.add({
 		targets: this.arcade_button,
@@ -1067,15 +1067,16 @@ introduction.preload = function(){
 introduction.create = function(){
 	this.bg = this.add.image(700, 325, 'bg').setScale(1.6);    
 	this.title = this.add.image(700, 100, 'button_title');
-	this.sys.install('DialogModalPlugin');
 	this.skipButton = this.add.image(1300, 400, 'button_skip');
-	this.skipButton.setInteractive({ useHandCursor: true });
-	// this.skipButton.on('pointerdown', () => {this.scene.start("homescreen");} );	
+	this.skipButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains).on('pointerdown', () => {this.scene.start("homescreen");} );;	
+	this.sys.install('DialogModalPlugin');
+	this.sys.dialogModal.init();
+	this.sys.dialogModal.setText('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', true);
 }
 
 game.scene.add('homescreen', homescreen);
 game.scene.add('gamescene', gamescene);
 game.scene.add('introduction', introduction);
 // game.scene.start('homescreen');
-// game.scene.start('introduction');
-game.scene.start('gamescene');
+game.scene.start('introduction');
+// game.scene.start('gamescene');
