@@ -1,5 +1,5 @@
 class Cutter{
-	constructor(obj, vel){
+	constructor(obj, vel,active){
 		this.vel = vel
 		this.obj = obj
 		this.unstopped = true;
@@ -7,7 +7,8 @@ class Cutter{
 		this.iscutting = false;
 		this.health = 100;
 		this.tint = [255, 255, 255]
-	}
+		this.active = active;
+	}   
 	setDest(x, y){
 		this.destx = x
 		this.desty = y

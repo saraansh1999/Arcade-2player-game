@@ -95,7 +95,7 @@ gamescene.preload = function(){
 }
 
 var num_cutters, cutters, num_trees, trees, poachers, poachertl=false, poachertr=false, poacherbl=false, poacherbr=false;;
-var num_foxes ;
+var num_foxes,active_cutters,total_cutters ;
 var num_bins ;
 var waste_cnt;
 var d = new Date()
@@ -113,31 +113,22 @@ gamescene.create = function(){
     sk = this.add.image(1170, 400, 'sky');
     sk.setDisplaySize(550,900);
     //create woodcutter
-    num_cutters = 4
+    num_cutters = 20;
+    active_cutters = 0;
+    total_cutters = 20;
     var a =50;
     cutters = []
     for (var i = 0; i < num_cutters; i++) {
-    	var x = Phaser.Math.RND.between(0, 50);
+    	var x = -20;
     	var y = a
-    	a= a+100;
-    	tempCutter = new Cutter(this.physics.add.sprite(x, y, 'cutter'), 200)
+    	a= a+25;
+    	tempCutter = new Cutter(this.physics.add.sprite(x, y, 'cutter'), 200,0)
     	tempCutter.cutSound = this.sound.add('woodcut')
     	cutters.push(tempCutter);
     }
 
     //create health bars
-    bar = [];
 
-    //create trees
-    num_trees = 10
-    trees = this.physics.add.staticGroup();
-    for (var i = 0; i < num_trees; i++) {
-    	var x = Phaser.Math.RND.between(100, CANVAS_W-100);
-    	var y = Phaser.Math.RND.between(100, CANVAS_H-100);
-    	trees.create(x, y, 'tree').setScale(0.8);
-    	var tempBar=new HealthBar(this.add.image(x,y-50,'healthBar'));
-    	bar.push(tempBar);
-    }
 
 
     num_foxes = 1;
@@ -157,6 +148,19 @@ gamescene.create = function(){
     		selectFox(fox[0]);
     }, this);
 
+   
+    //create trees
+    bar = [];
+    num_trees = 10
+    trees = this.physics.add.staticGroup();
+    for (var i = 0; i < num_trees; i++) {
+    	var x = Phaser.Math.RND.between(100, CANVAS_W-100);
+    	var y = Phaser.Math.RND.between(100, CANVAS_H-100);
+    	trees.create(x, y, 'tree').setScale(0.8);
+    	var tempBar=new HealthBar(this.add.image(x,y-50,'healthBar'));
+    	bar.push(tempBar);
+    }
+   
     //create poachers
     num_poachers = 0
     poachers = []
@@ -436,10 +440,11 @@ function killPoacher(poacher){
 		}
 	}
 	num_poachers -= 1
-	d = new Date
-	t = d.getTime()
+	// d = new Date
+	// t = d.getTime()
 }
 
+var pre = d.getTime();
 gamescene.update = function(){
 
 
@@ -477,8 +482,10 @@ gamescene.update = function(){
     /////////////////////////////////////////
 
     d = new Date()
+
+
     if(d.getTime() - t > 10000){
-    	console.log("check", t%100000, d.getTime()%100000)
+    	// console.log("check", t%100000, d.getTime()%100000)
     	t = d.getTime()
     	let arr = shuffle([1, 2, 3, 4])
     	for(var i = 0; i < 4; i++){
@@ -661,13 +668,19 @@ gamescene.update = function(){
     				}
     			}, this);
     			if(cnt > 0)
+    			{
     				cutters[i].setDest(destx, desty);
+    			}   
     		}
     	}
-    	cutters[i].move()
+    	// if(i>5)
+    		// console.log(i,destx,desty);
+    	if(cutters[i].active == 1)
+    		cutters[i].move()       
 
 
     	if(cutters[i].obj.body.velocity.x > 0){
+    		console.log(i,cutters[i].obj.body.velocity.x);
     		cutters[i].obj.anims.play('right', true)
     	}
     	else if(cutters[i].obj.body.velocity.x < 0){
@@ -770,7 +783,7 @@ gamescene.update = function(){
     			{
     				fox[i].cutter = -1;
     				collider_tree_cutter[id].destroy;
-    				cutters[id].setDest(20, id*50+50);
+    				cutters[id].setDest(20, 650);
     				// cutters[id].obj.setTint(0x0000ff);
     				cutters[id].unstopped = 1;
     				cutters[id].cutfrom = 'no';
@@ -904,6 +917,14 @@ gamescene.update = function(){
         }
     }
     //////////////////////////////////////////////
+    d = new Date()
+    t = d.getTime();
+    if(t-pre > 3000 && active_cutters < total_cutters)
+    {
+    	pre = t;
+    	cutters[active_cutters].active = 1;
+    	active_cutters=active_cutters + 1;
+    }
 }
 
 homescreen.preload = function(){
@@ -966,6 +987,6 @@ introduction.create = function(){
 game.scene.add('homescreen', homescreen);
 game.scene.add('gamescene', gamescene);
 game.scene.add('introduction', introduction);
-game.scene.start('homescreen');
+// game.scene.start('homescreen');
 // game.scene.start('introduction');
-// game.scene.start('gamescene');
+game.scene.start('gamescene');
