@@ -3,6 +3,7 @@ CANVAS_H = 600;
 
 var gamescene = new Phaser.Scene("gamescene");
 var homescreen = new Phaser.Scene("homescreen");
+var introduction = new Phaser.Scene("introduction");
 
 function findDis(a, b){
 	var t = a.x - b.x;
@@ -946,8 +947,28 @@ homescreen.create = function(){
 homescreen.update = function(){
 }
 
+introduction.preload = function(){
+	this.load.plugin('DialogModalPlugin', './dialog_plugin.js');
+	this.load.image('bg', 'assets/bg.jpg');
+	this.load.image('button_title', 'assets/button_feral-retaliation.png');
+	this.load.image('button_skip', 'assets/button_skip.png');
+}
+
+introduction.create = function(){
+	this.bg = this.add.image(700, 325, 'bg').setScale(1.6);    
+	this.title = this.add.image(700, 100, 'button_title');
+	this.sys.install('DialogModalPlugin');
+	// this.skipButton = this.add.image(1300, 400, 'button_skip');
+	// this.skipButton.setInteractive({ useHandCursor: true });
+	// this.skipButton.on('pointerdown', () => {this.scene.start("homescreen");} );
+
+	console.log(this.sys.dialogModal);
+	this.sys.dialogModal.init();
+	this.sys.dialogModal.setText('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', true);
+}
+
 game.scene.add('homescreen', homescreen);
 game.scene.add('gamescene', gamescene);
-
+game.scene.add('introduction', introduction);
 // game.scene.start('homescreen');
-game.scene.start('gamescene');
+game.scene.start('introduction');
