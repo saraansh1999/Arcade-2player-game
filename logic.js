@@ -1104,40 +1104,36 @@ gamescene.update = function(){
 
 homescreen.preload = function(){
 	this.load.image('bg', 'assets/bg.jpg');
-	this.load.image('button_arcade', 'assets/button_arcade.png');
-	this.load.image('button_timeless', 'assets/button_timeless.png');
+	this.load.image('button_play', 'assets/button_play.png');
 	this.load.image('button_title', 'assets/button_feral-retaliation.png');
 }
 
 homescreen.create = function(){
 	
 	this.bg = this.add.image(700, 325, 'bg').setScale(1.6);    
-	this.title = this.add.image(700, 100, 'button_title');
-	this.arcade_button = this.add.image(1300, 1300, 'button_arcade');
-	this.timeless_button = this.add.image(-100, -100, 'button_timeless');    
-	this.arcade_button.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains);
-	this.timeless_button.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains);
+	this.title = this.add.image(1500, 100, 'button_title');
+	this.play_button = this.add.image(1300, 1300, 'button_play');
+	this.play_button.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains);
 	
 	var tween = this.tweens.add({
-		targets: this.arcade_button,
+		targets: this.play_button,
 		x: 700,
 		y: 320,
-		duration: 3000,
+		duration: 5000,
 		ease: "Elastic",
 		easeParams: [1.5, 0.5],
 	}, this);
-	
-	tween = this.tweens.add({
-		targets: this.timeless_button,
+
+	var tween = this.tweens.add({
+		targets: this.title,
 		x: 700,
-		y: 420,
-		duration: 3000,
+		y: 100,
+		duration: 5000,
 		ease: "Elastic",
 		easeParams: [1.5, 0.5],
 	}, this);
 	
-	this.arcade_button.on('pointerdown', () => {this.scene.start("gamescene");} );
-	this.timeless_button.on('pointerdown', () => {this.scene.start("gamescene");} );
+	this.play_button.on('pointerdown', () => {this.scene.start("gamescene");} );
 }
 
 homescreen.update = function(){
@@ -1180,7 +1176,7 @@ introduction1.create = function(){
 
 	this.sys.install('DialogModalPlugin');
 	this.sys.dialogModal.init();
-	this.sys.dialogModal.setText('Arrrgh!! The world as we know it is soon going to come to an end and here I am stuck at the same problem for my new invention since the past 5 years.\n All I need is to cross paths with one LightBulb moment and I\'ll change the world forever.', true);
+	this.sys.dialogModal.setText('Arrrgh!! The world as we know it is soon going to come to an end and here I am stuck on the same problem for my new invention since the past 5 years.\n All I need is to cross paths with one LightBulb moment and I\'ll change the world forever.', true);
 	
 	this.anims.create({
 		key: 'scientistup',
@@ -1290,14 +1286,127 @@ function stopDrag(pointer){
 
 
 introduction2.preload = function(){
+	this.load.plugin('DialogModalPlugin', './dialog_plugin.js');
+	this.load.image('bg', 'assets/jungle.jpg');
 	this.load.image('button_title', 'assets/button_feral-retaliation.png');
+	this.load.image('animal_bear', 'assets/bear.png');
+	this.load.image('animal_wolf', 'assets/animal_wolf.png');
+	this.load.image('animal_elephant', 'assets/elephant.png');
+	this.load.image('animal_monkey', 'assets/monkey.png');
+	this.load.image('button_next', 'assets/button_next.png');
+	this.load.spritesheet('scientist', 'assets/scientist.png', {
+		frameWidth: 64 , frameHeight: 64
+	});
 }
 
 introduction2.create = function(){
+	this.bg = this.add.image(700, 200, 'bg').setScale(2);
+	this.bg.scaleX = 2.2;
+	this.bg.scaleY = 2.4;
+	this.scientist = new Scientist(this.physics.add.sprite(-100, 450, 'scientist'));
+	this.scientist.obj.scaleX = 2;
+	this.scientist.obj.scaleY = 2;
 	this.title = this.add.image(700, 100, 'button_title');
+	this.bear = this.add.image(900, 400, 'animal_bear').setScale(0.05);
+	this.wolf = this.add.image(700, 400, 'animal_wolf').setScale(0.2);
+	this.elephant = this.add.image(1200, 400, 'animal_elephant').setScale(0.2);
+	this.monkey = this.add.image(1100, 450, 'animal_monkey').setScale(0.1);
+	this.next = this.add.image(1300, 500, 'button_next');
+	this.next.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains).on('pointerdown', () => {this.scene.switch("homescreen");} );
+
+	this.sys.install('DialogModalPlugin');
+	this.sys.dialogModal.init();
+	this.sys.dialogModal.setText('Bear: Grrrrrr!! What\'s this puny little human doing here?', true);
+	this.counter = 1;
+	this.tempCount = 0;
+	this.anims.create({
+		key: 'scientistup',
+		frames: this.anims.generateFrameNumbers('scientist', {start: 13, end: 16}),
+		frameRate: 10,
+		repeat: -1
+	});
+	this.anims.create({
+		key: 'scientistdown',
+		frames: this.anims.generateFrameNumbers('scientist', {start: 0, end: 3}),
+		frameRate: 10,
+		repeat: -1
+	});
+	this.anims.create({
+		key: 'scientistleft',
+		frames: this.anims.generateFrameNumbers('scientist', {start: 4, end: 7}),
+		frameRate: 10,
+		repeat: -1
+	});
+	this.anims.create({
+		key: 'scientistright',
+		frames: this.anims.generateFrameNumbers('scientist', {start: 8, end: 11}),
+		frameRate: 10,
+		repeat: -1
+	});
+	this.anims.create({
+		key: 'scientistturn',
+		frames: this.anims.generateFrameNumbers('scientist', {start: 0, end: 0}),
+		frameRate: 10,
+		repeat: -1
+	});
+	this.scientist.obj.anims.play('scientistright', true);
+	var tween = this.tweens.add({
+		targets: this.scientist.obj,
+		x: 400,
+		y: 450,
+		duration: 2000,
+		ease: "Linear",
+		easeParams: [0.5, 0.5],
+		delay: 0,
+		onComplete: () => {
+			this.scientist.obj.anims.pause();
+		}
+	}, this);
 }
 
 introduction2.update = function(){
+	this.tempCount++;
+	console.log(this.tempCount, this.counter);
+
+	if(this.tempCount > (this.sys.dialogModal.dialog.length * 3)){
+		if(this.counter == 1){
+			this.sys.dialogModal.updateText('Scientist: Relax, I come in peace. I have a proposition that I would like to discuss with your leader.', true);
+			this.counter = 2;
+		}else
+		if(this.counter == 2){
+			this.sys.dialogModal.updateText('Monkey: Huh!! Why would we listen to anything you have to say? Your species is the reason we suffer all the time! You don\'t even realize that with each tree you cut, you\'re vandalising homes of hundreds.', true);
+			this.counter = 3;
+		}else
+		if(this.counter == 3){
+			this.sys.dialogModal.updateText('Elephant: You barge into our homes, and kill us for your petty needs. We don\'t want you here. Go away, or the repercussions will be severe.', true);
+			this.counter = 4;
+		}else
+		if(this.counter == 4){
+			this.sys.dialogModal.updateText('Scientist: Please! Just hear me out once. I am not a bad guy. I really am here to help. Please give me a chance.', true);
+			this.counter = 5;
+		}else
+		if(this.counter == 5){
+			this.sys.dialogModal.updateText('Wolf: Calm down everybody! Let us hear him out.', true);
+			this.counter = 6;
+		}else
+		if(this.counter == 6){
+			this.sys.dialogModal.updateText('Scientist: Thanks for the opportunity! Your leadership paired with my inventions and intellect can help us restore the order that\'s long been lost. Please trust me.', true);
+			this.counter = 7;
+		}else
+		if(this.counter == 7){
+			this.sys.dialogModal.updateText('Wolf: Okay, I\'m willing to work with you, but you\'ll have to earn our trust.', true);
+			this.counter = 8;
+		}else
+		if(this.counter == 8){
+			this.sys.dialogModal.updateText('Scientist: Let\'s begin!', true);
+			this.counter = 9;
+		}else
+		if(this.counter == 9){
+			this.scene.switch("homescreen");
+		}
+		
+		this.tempCount = 0;
+	}
 }
 
 
