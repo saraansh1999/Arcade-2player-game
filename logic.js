@@ -58,11 +58,14 @@ gamescene.preload = function(){
 	this.load.image('paperball', 'assets/paperwaste.png');
 	this.load.image('bottle1', 'assets/bottle1.png');
 	this.load.image('bottle2', 'assets/bottle2.png');
+	this.load.image('bottle3', 'assets/bottle3.png');
 	this.load.image('banana', 'assets/bananawaste.png');
 	this.load.image('cardboard', 'assets/cardboard_waste.png');
 	this.load.image('apple', 'assets/apple_waste.png');
 	this.load.image('organic', 'assets/organic_waste.png');
-
+	this.load.image('fruit1', 'assets/fruit1.png');
+	this.load.image('notebook', 'assets/notebookwaste.png');
+	this.load.image('paperroll', 'assets/paperroll.png');
 
 	this.load.spritesheet('cutter', 'assets/cutter_sprites.png', 
 		{frameWidth: 64, frameHeight: 64}
@@ -98,6 +101,8 @@ var num_cutters, cutters, num_trees, trees, poachers, poachertl=false, poachertr
 var num_foxes,active_cutters,total_cutters ;
 var num_bins ;
 var waste_cnt;
+var cnt_active_wastes;
+var active_wastes = []
 var d = new Date()
 var t = d.getTime()
 
@@ -182,7 +187,7 @@ gamescene.create = function(){
 
 
     waste = [] ;
-    num_wastes = 8 ;
+    num_wastes = 12 ;
 
     temp=new Waste(this.add.image(1000,150,'paperball').setScale(0.1),'paper');
     waste.push(temp);
@@ -196,10 +201,19 @@ gamescene.create = function(){
     waste.push(temp);
     temp=new Waste(this.add.image(1100, 250,'cardboard').setScale(0.3),'paper');
     waste.push(temp);
-    temp=new Waste(this.add.image(1200, 250,'apple').setScale(0.05),'organic');
+    temp=new Waste(this.add.image(1200, 250,'apple').setScale(0.03),'organic');
     waste.push(temp);
-    temp=new Waste(this.add.image(1300, 250,'organic').setScale(0.15),'organic');
+    temp=new Waste(this.add.image(1300, 250,'organic').setScale(0.1),'organic');
     waste.push(temp);
+    temp=new Waste(this.add.image(1000, 350,'fruit1').setScale(0.1),'organic');
+    waste.push(temp);
+    temp=new Waste(this.add.image(1100, 350,'paperroll').setScale(0.25),'paper');
+    waste.push(temp);
+    temp=new Waste(this.add.image(1200, 350,'notebook').setScale(0.07),'paper');
+    waste.push(temp);
+    temp=new Waste(this.add.image(1300, 350,'bottle3').setScale(0.15),'plastic');
+    waste.push(temp);
+
 
     timer=new Timer(this.add.image(1146,50,'healthBar'));
     timer.obj.scaleX= 5;
@@ -484,7 +498,6 @@ gamescene.update = function(){
 
 
     if(d.getTime() - t > 1000){
-    	// console.log("check", t%100000, d.getTime()%100000)
     	t = d.getTime()
     	let arr = shuffle([1, 2, 3, 4])
     	for(var i = 0; i < 4; i++){
@@ -673,14 +686,11 @@ gamescene.update = function(){
     			}   
     		}
     	}
-    	// if(i>5)
-    		// console.log(i,destx,desty);
     	if(cutters[i].active == 1)
     		cutters[i].move()       
 
 
     	if(cutters[i].obj.body.velocity.x > 0){
-    		console.log(i,cutters[i].obj.body.velocity.x);
     		cutters[i].obj.anims.play('right', true)
     	}
     	else if(cutters[i].obj.body.velocity.x < 0){
@@ -796,7 +806,6 @@ gamescene.update = function(){
     	}
     }
     //scientist poacher interaction
-    // console.log(scientist.inGame);
     if(scientist.inGame == 0)
     {
     	for(var i =0 ;  i < num_poachers ; i++)
@@ -810,10 +819,25 @@ gamescene.update = function(){
     			scientist.obj.y = 450;
     			timer.start = 1;
     			waste_cnt = 0;
-    			for(var j =0 ; j < num_wastes ; j++)
+    			num_active_wastes = 4;
+    			active_wastes = []
+    			for(var j = 0 ;j < num_active_wastes;j++)
     			{
-    				waste[j].reset();
+    				x=Phaser.Math.RND.between(0,11);
+    				console.log(x);
+    				if(waste[x].obj.visible == 1)
+    				{
+    					j--;
+    					continue;
+    				}
+    				waste[x].reset();
+    				active_wastes.push(x);
     			}
+    		
+    			// for(var j =0 ; j < num_wastes ; j++)
+    			// {
+    			// 	waste[j].reset();
+    			// }
     			for(var j = 0; j <num_bins ;j++)
     			{
     				bins[j].reset();
@@ -829,19 +853,19 @@ gamescene.update = function(){
     {
         // GAME1 /////////////////////////////////////
 
-        for (var i =0 ;i < num_wastes ; i++)
+        for (var i =0 ;i < num_active_wastes ; i++)
         {
-        	if(waste[i].inBin == 0)
+        	if(waste[active_wastes[i]].inBin == 0)
         	{
         		if(scientist.curWaste == -1)
         		{
-        			var dx=(waste[i].obj.x-scientist.obj.x);
-        			var dy=(waste[i].obj.y-scientist.obj.y);
+        			var dx=(waste[active_wastes[i]].obj.x-scientist.obj.x);
+        			var dy=(waste[active_wastes[i]].obj.y-scientist.obj.y);
         			var d = (dx*dx+dy*dy);     
         			if(d < 3000)
         			{
-        				waste[i].isPicked  = 1;
-        				scientist.curWaste = i;
+        				waste[active_wastes[i]].isPicked  = 1;
+        				scientist.curWaste = active_wastes[i];
         			}
         		}
         	}
@@ -859,7 +883,6 @@ gamescene.update = function(){
         		{
         			if(bins[i].check(x,y)==1)
         			{
-        				// console.log(x,y);
         				if(waste[id].type==bins[i].type)
         				{
         					scientist.curWaste = -1;
@@ -882,16 +905,16 @@ gamescene.update = function(){
         	}
         }
 
-        if(waste_cnt == num_wastes && timer.health > 0)
+        if(waste_cnt == num_active_wastes && timer.health > 0)
         {
         	waste_cnt = 0;
-        	for(var i =0 ; i < num_wastes ;i++)
+        	for(var i =0 ; i < num_active_wastes ;i++)
         	{
-        		waste[i].hide();
+        		waste[active_wastes[i]].hide();
         	}
         	for(var i=0; i< num_bins;i++)
         	{
-        		bins[i].hide();
+        		bins[i].hide();	
         	}
         	timer.hide();
         	scientist.reset(1);
@@ -899,9 +922,9 @@ gamescene.update = function(){
         }
         else if(timer.health <= 0){
         	waste_cnt = 0;
-        	for(var i =0 ; i < num_wastes ;i++)
+        	for(var i =0 ; i < num_active_wastes ;i++)
         	{
-        		waste[i].hide();
+        		waste[active_wastes[i]].hide();
         	}
         	for(var i=0; i< num_bins;i++)
         	{

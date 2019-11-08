@@ -10,20 +10,6 @@ class Waste
 		this.startx = obj.x;
 		this.starty = obj.y;
 	}
-	
-	// check()
-	// {
-	// 	// console.log('x',this.obj.x, this.lx , this.ux);
-	// 	// console.log('y',this.obj.y, this.ly , this.uy);
-	// 	if(this.obj.x >= this.lx && this.obj.x<=this.ux  )
-	// 	{
-	// 		if(this.obj.y >= this.ly && this.obj.y<=this.uy)
-	// 		{
-	// 			return 1;
-	// 		}
-	// 	}
-	// 	return 0;
-	// }
 
 	reset()
 	{
