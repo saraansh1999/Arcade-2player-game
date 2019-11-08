@@ -958,17 +958,14 @@ introduction.create = function(){
 	this.bg = this.add.image(700, 325, 'bg').setScale(1.6);    
 	this.title = this.add.image(700, 100, 'button_title');
 	this.sys.install('DialogModalPlugin');
-	// this.skipButton = this.add.image(1300, 400, 'button_skip');
-	// this.skipButton.setInteractive({ useHandCursor: true });
-	// this.skipButton.on('pointerdown', () => {this.scene.start("homescreen");} );
-
-	console.log(this.sys.dialogModal);
-	this.sys.dialogModal.init();
-	this.sys.dialogModal.setText('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', true);
+	this.skipButton = this.add.image(1300, 400, 'button_skip');
+	this.skipButton.setInteractive({ useHandCursor: true });
+	// this.skipButton.on('pointerdown', () => {this.scene.start("homescreen");} );	
 }
 
 game.scene.add('homescreen', homescreen);
 game.scene.add('gamescene', gamescene);
 game.scene.add('introduction', introduction);
-// game.scene.start('homescreen');
-game.scene.start('introduction');
+game.scene.start('homescreen');
+// game.scene.start('introduction');
+// game.scene.start('gamescene');
