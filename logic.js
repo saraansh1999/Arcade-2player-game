@@ -1261,7 +1261,7 @@ introduction1.update = function(){
 		}
 	}
 	if(this.done == 1){
-		this.sys.dialogModal.updateText("Thanks for helping me find this idea. We are going to save the world!!", true);
+		this.sys.dialogModal.updateText("I have got it now. It was right infront of me all this time. \nWith the help of this Inter-Species Vocal Transmitter I can now communicate and join forces with our feral counterparts. \nLet's turn the tables around!!", true);
 		this.done = 2;
 	}
 	if(this.done == 2){
@@ -1289,11 +1289,12 @@ function stopDrag(pointer){
 
 
 
-
 introduction2.preload = function(){
+	this.load.image('button_title', 'assets/button_feral-retaliation.png');
 }
 
 introduction2.create = function(){
+	this.title = this.add.image(700, 100, 'button_title');
 }
 
 introduction2.update = function(){
@@ -1305,5 +1306,5 @@ game.scene.add('gamescene', gamescene);
 game.scene.add('introduction1', introduction1);
 game.scene.add('introduction2', introduction2);
 // game.scene.start('homescreen');
-// game.scene.start('introduction1');
-game.scene.start('gamescene');
+game.scene.start('introduction1');
+// game.scene.start('gamescene');
