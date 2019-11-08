@@ -113,7 +113,7 @@ gamescene.preload = function(){
 }
 
 var num_cutters, cutters, num_trees, trees, poachers, poachertl=false, poachertr=false, poacherbl=false, poacherbr=false;;
-var num_foxes,active_cutters,total_cutters ;
+var num_foxes,active_cutters,total_cutters,tot_poachers=0 ;
 var num_bins ;
 var waste_cnt;
 var cnt_active_wastes;
@@ -184,18 +184,28 @@ gamescene.create = function(){
 	}, this);
 	
 	
-	//create trees
-	bar = [];
-	num_trees = 10
-	trees = this.physics.add.staticGroup();
-	for (var i = 0; i < num_trees; i++) {
-		var x = Phaser.Math.RND.between(100, CANVAS_W-100);
-		var y = Phaser.Math.RND.between(100, CANVAS_H-100);
-		trees.create(x, y, 'tree').setScale(0.8).setSize(72, 96, 36, 48);
-		
-		var tempBar=new HealthBar(this.add.image(x,y-50,'healthBar'));
-		bar.push(tempBar);
-	}
+    //create trees
+    bar = [];
+    num_trees = 16
+    trees = this.physics.add.staticGroup();
+    a = 150
+    b = 150
+    for (var i = 0; i < num_trees; i++) {
+        var x = Phaser.Math.RND.between(a-50, a+50);
+        var y = Phaser.Math.RND.between(b-50, b+50);
+        // console.log(i,a,x,y);
+        trees.create(x, y, 'tree').setScale(0.8).setSize(72, 96, 36, 48);
+        
+        var tempBar=new HealthBar(this.add.image(x,y-50,'healthBar'));
+        bar.push(tempBar);
+        b = b+125;
+        if(b == 650)
+        {
+            b = 150;
+            a = a + 175;
+        }
+    }
+
 	
 	//explosion
 	explosion = this.physics.add.sprite(-100, -100, 'explosion').setScale(0.6)
@@ -586,72 +596,82 @@ gamescene.update = function(){
 	}
 	/////////////////////////////////////////
 	
-	d = new Date()
-	
-	
-	if(d.getTime() - t > 10000){
-		t = d.getTime()
-		let arr = shuffle([1, 2, 3, 4])
-		for(var i = 0; i < 4; i++){
-			if(arr[i] == 1){
-				if(!poachertl){
-					var y = -100
-					var x = -100
-					var destx = 50
-					var desty = 50
-					tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 1);
-					tempPoacher.shootSound = this.sound.add('arrow')
-					poachers.push(tempPoacher)
-					num_poachers += 1
-					poachertl = true
-					break;
-				}
-			}
-			else if(arr[i] == 2){
-				if(!poacherbl){
-					var y = CANVAS_H
-					var x = -100
-					var destx = 50
-					var desty = CANVAS_H - 50
-					tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 2);
-					tempPoacher.shootSound = this.sound.add('arrow')
-					poachers.push(tempPoacher)
-					num_poachers += 1
-					poacherbl = true
-					break;
-				}
-			}
-			else if(arr[i] == 3){
-				if(!poacherbr){
-					var y = CANVAS_H
-					var x = CANVAS_W
-					var destx = CANVAS_W - 50
-					var desty = CANVAS_H - 50
-					tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 3);
-					tempPoacher.shootSound = this.sound.add('arrow')
-					poachers.push(tempPoacher)
-					num_poachers += 1
-					poacherbr = true
-					break;
-				}
-				
-			}
-			else if(arr[i] == 4){
-				if(!poachertr){
-					var y = -100
-					var x = CANVAS_W
-					var destx = CANVAS_W - 50
-					var desty = 50
-					tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 4);
-					tempPoacher.shootSound = this.sound.add('arrow')
-					poachers.push(tempPoacher)
-					num_poachers += 1
-					poachertr = true
-					break;
-				}
-			}
-		}
-	}
+    
+    d = new Date()
+    
+    val = 10000;
+    if(tot_poachers >= 4)
+    {
+        val =20000;
+    }
+    else if(tot_poachers == 0)
+    {
+        val = 0;
+    }
+    if(d.getTime() - t > val ){
+        tot_poachers +=1 ;
+        t = d.getTime()
+        let arr = shuffle([1, 2, 3, 4])
+        for(var i = 0; i < 4; i++){
+            if(arr[i] == 1){
+                if(!poachertl){
+                    var y = -100
+                    var x = -100
+                    var destx = 50
+                    var desty = 50
+                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 1);
+                    tempPoacher.shootSound = this.sound.add('arrow')
+                    poachers.push(tempPoacher)
+                    num_poachers += 1
+                    poachertl = true
+                    break;
+                }
+            }
+            else if(arr[i] == 2){
+                if(!poacherbl){
+                    var y = CANVAS_H + 35
+                    var x = -100
+                    var destx = 50
+                    var desty = CANVAS_H + 35;
+                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 2);
+                    tempPoacher.shootSound = this.sound.add('arrow')
+                    poachers.push(tempPoacher)
+                    num_poachers += 1
+                    poacherbl = true
+                    break;
+                }
+            }
+            else if(arr[i] == 3){
+                if(!poacherbr){
+                    var x = CANVAS_W + 160;
+                    var y = CANVAS_H + 160;
+                    var destx = CANVAS_W + 30;
+                    var desty = CANVAS_H + 35;
+                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 3);
+                    tempPoacher.shootSound = this.sound.add('arrow')
+                    poachers.push(tempPoacher)
+                    num_poachers += 1
+                    poacherbr = true
+                    break;
+                }
+                
+            }
+            else if(arr[i] == 4){
+                if(!poachertr){
+                    var y = -100
+                    var x = CANVAS_W
+                    var destx = CANVAS_W + 30 ;
+                    var desty = 50
+                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 4);
+                    tempPoacher.shootSound = this.sound.add('arrow')
+                    poachers.push(tempPoacher)
+                    num_poachers += 1
+                    poachertr = true
+                    break;
+                }
+            }
+        }
+    }
 	for(var i = 0; i < num_poachers; i++){
 		
 		if(poachers[i].shooting >= 0 && poachers[i].crosshair.alpha >= 1){
@@ -1053,6 +1073,8 @@ gamescene.update = function(){
 		}
 	}
 	if(scientist.inGame == 3){
+		scientist.obj.x = 1150;
+        scientist.obj.y = 300 ;
 		console.log(spaceBar)
 		if(spaceBar.isDown){
 			explosion_sound.play({
@@ -1283,5 +1305,5 @@ game.scene.add('gamescene', gamescene);
 game.scene.add('introduction1', introduction1);
 game.scene.add('introduction2', introduction2);
 // game.scene.start('homescreen');
-game.scene.start('introduction1');
-// game.scene.start('gamescene');
+// game.scene.start('introduction1');
+game.scene.start('gamescene');
