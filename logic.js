@@ -5,6 +5,7 @@ var gamescene = new Phaser.Scene("gamescene");
 var homescreen = new Phaser.Scene("homescreen");
 var introduction1 = new Phaser.Scene("introduction1");
 var introduction2 = new Phaser.Scene("introduction2");
+var endscreen = new Phaser.Scene("endscreen");
 
 function findDis(a, b){
 	var t = a.x - b.x;
@@ -1409,11 +1410,28 @@ introduction2.update = function(){
 	}
 }
 
-
+endscreen.preload = function(){
+	this.load.image('button_go', 'assets/button_game-over.png');
+	this.load.image('button_replay', 'assets/button_replay.png');
+}
+endscreen.create = function(){
+	this.gameOver = this.add.image(700, 350, 'button_go');
+	this.replay = this.add.image(700, 450, 'button_replay');
+	this.replay.setInteractive();
+	this.replay.on('pointerdown', () => {
+		this.registry.destroy(); // destroy registry
+		this.events.off(); // disable all active events
+		this.scene.switch("homescreen"); // restart current scene
+	});
+}
+endscreen.update = function(){
+}
 game.scene.add('homescreen', homescreen);
 game.scene.add('gamescene', gamescene);
 game.scene.add('introduction1', introduction1);
 game.scene.add('introduction2', introduction2);
+game.scene.add('endscreen', endscreen);
 // game.scene.start('homescreen');
-game.scene.start('introduction1');
+// game.scene.start('introduction2');
 // game.scene.start('gamescene');
+game.scene.start('endscreen');
