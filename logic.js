@@ -4,6 +4,7 @@ CANVAS_H = 600;
 var gamescene = new Phaser.Scene("gamescene");
 var homescreen = new Phaser.Scene("homescreen");
 var introduction1 = new Phaser.Scene("introduction1");
+var introduction2 = new Phaser.Scene("introduction2");
 
 function findDis(a, b){
 	var t = a.x - b.x;
@@ -1139,7 +1140,7 @@ introduction1.create = function(){
 	this.skipButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains).on('pointerdown', () => {this.scene.switch("homescreen");} );
 
 	this.nextButton = this.add.image(1300, 470, 'button_next');
-	this.skipButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains).on('pointerdown', () => {this.scene.switch("introduction12");} );	
+	this.nextButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains).on('pointerdown', () => {this.scene.switch("introduction2");} );	
 	this.nextButton.visible = false;
 
 	this.scientist = new Scientist(this.physics.add.sprite(400, 350, 'scientist'));
@@ -1264,9 +1265,23 @@ function stopDrag(pointer){
 	}, this);
 }
 
+
+
+
+introduction2.preload = function(){
+}
+
+introduction2.create = function(){
+}
+
+introduction2.update = function(){
+}
+
+
 game.scene.add('homescreen', homescreen);
 game.scene.add('gamescene', gamescene);
 game.scene.add('introduction1', introduction1);
+game.scene.add('introduction2', introduction2);
 // game.scene.start('homescreen');
 game.scene.start('introduction1');
 // game.scene.start('gamescene');
