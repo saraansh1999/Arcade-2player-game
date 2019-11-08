@@ -8,7 +8,7 @@ class Poacher{
 		this.type = type
 		this.crosshair = chobj
 		this.crosshair.alpha = 0.1
-		this.shooting = -400
+		this.shooting = -1000
 		this.blastRadius = this.crosshair.displayWidth
 		this.shootSound = undefined
 	}

@@ -68,8 +68,8 @@ gamescene.preload = function(){
 	this.load.image('paperroll', 'assets/paperroll.png');
 	
 	this.load.spritesheet('cutter', 'assets/cutter_sprites.png', 
-	{frameWidth: 64, frameHeight: 64}
-	);
+		{frameWidth: 64, frameHeight: 64}
+		);
 	this.load.spritesheet('fox1', 'assets/wolf1.png', {
 		frameWidth: 32, frameHeight: 64
 	});
@@ -94,6 +94,9 @@ gamescene.preload = function(){
 	this.load.spritesheet('scientist', 'assets/scientist.png', {
 		frameWidth: 64 , frameHeight: 64
 	});
+	this.load.spritesheet('explosion', 'assets/explosion.png', {
+		frameWidth: 192 , frameHeight: 192
+	});
 	
 }
 
@@ -105,6 +108,7 @@ var cnt_active_wastes;
 var active_wastes = []
 var d = new Date()
 var t = d.getTime()
+var spaceBar
 
 gamescene.create = function(){
 	//soundtracks
@@ -165,7 +169,7 @@ gamescene.create = function(){
 	}
 	this.input.keyboard.on('keyup', function(event){
 		if(event.key == "1")
-		selectFox(fox[0]);
+			selectFox(fox[0]);
 	}, this);
 	
 	
@@ -182,6 +186,9 @@ gamescene.create = function(){
 		bar.push(tempBar);
 	}
 	
+	//explosion
+	explosion = this.physics.add.sprite(-100, -100, 'explosion').setScale(0.6)
+
 	//create poachers
 	num_poachers = 0
 	poachers = []
@@ -238,11 +245,13 @@ gamescene.create = function(){
 	for(var i = 0; i < num_wastes; i++){
 		waste[i].obj.visible = 0;
 		if(i<num_bins)
-		bins[i].obj.visible = 0;
+			bins[i].obj.visible = 0;
 	}                                                           
 	timer.obj.visible = 0;
 	/////////////////////////////////////////////////////
 	
+	spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
 	//animations
 	this.anims.create({
 		key: 'foxright',
@@ -441,6 +450,12 @@ gamescene.create = function(){
 		frameRate: 10,
 		repeat: -1
 	})
+	this.anims.create({
+		key: 'explosion',
+		frames: this.anims.generateFrameNumbers('explosion', {start: 0, end: 24}),
+		frameRate: 10,
+		repeat: 0
+	})
 	
 	cursors = this.input.keyboard.createCursorKeys();
 	
@@ -488,13 +503,13 @@ function shuffle(array) {
 
 function killPoacher(poacher){
 	if(poacher.type == 1)
-	poachertl = false
+		poachertl = false
 	else if(poacher.type == 2)
-	poacherbl = false
+		poacherbl = false
 	else if(poacher.type == 3)
-	poacherbr = false
+		poacherbr = false
 	else
-	poachertr = false
+		poachertr = false
 	
 	poacher.die()
 	for(var i = 0; i < num_poachers; i++){
@@ -513,42 +528,44 @@ gamescene.update = function(){
 	
 	
 	//scientist movements/////////////////
-	if (cursors.left.isDown)
-	{
-		scientist.obj.setVelocityX(-330);
-		scientist.obj.setVelocityY(0);
-		scientist.obj.anims.play('scientistleft', true);
-	}
-	else if (cursors.right.isDown)
-	{
-		scientist.obj.setVelocityX(330);
-		scientist.obj.setVelocityY(0);
-		scientist.obj.anims.play('scientistright', true);
-	}
-	else if (cursors.up.isDown)
-	{
-		scientist.obj.setVelocityY(-330);
-		scientist.obj.setVelocityX(0);
-		scientist.obj.anims.play('scientistup', true);
-	}
-	else if (cursors.down.isDown)
-	{
-		scientist.obj.setVelocityY(330);
-		scientist.obj.setVelocityX(0);
-		scientist.obj.anims.play('scientistdown', true);
-	}
-	else
-	{
-		scientist.obj.setVelocityX(0);
-		scientist.obj.setVelocityY(0);
-		scientist.obj.anims.play('scientistturn');
+	if(scientist.can_move){
+		if (cursors.left.isDown)
+		{
+			scientist.obj.setVelocityX(-330);
+			scientist.obj.setVelocityY(0);
+			scientist.obj.anims.play('scientistleft', true);
+		}
+		else if (cursors.right.isDown)
+		{
+			scientist.obj.setVelocityX(330);
+			scientist.obj.setVelocityY(0);
+			scientist.obj.anims.play('scientistright', true);
+		}
+		else if (cursors.up.isDown)
+		{
+			scientist.obj.setVelocityY(-330);
+			scientist.obj.setVelocityX(0);
+			scientist.obj.anims.play('scientistup', true);
+		}
+		else if (cursors.down.isDown)
+		{
+			scientist.obj.setVelocityY(330);
+			scientist.obj.setVelocityX(0);
+			scientist.obj.anims.play('scientistdown', true);
+		}
+		else
+		{
+			scientist.obj.setVelocityX(0);
+			scientist.obj.setVelocityY(0);
+			scientist.obj.anims.play('scientistturn');
+		}
 	}
 	/////////////////////////////////////////
 	
 	d = new Date()
 	
 	
-	if(d.getTime() - t > 1000){
+	if(d.getTime() - t > 10000){
 		t = d.getTime()
 		let arr = shuffle([1, 2, 3, 4])
 		for(var i = 0; i < 4; i++){
@@ -644,6 +661,9 @@ gamescene.update = function(){
 		poachers[i].move()
 		if(poachers[i].obj.body.velocity.x == 0 && poachers[i].obj.body.velocity.y == 0){
 			if(poachers[i].crosshair.alpha >= 0.9){
+				poachers[i].shootSound.play({
+					volume: 0.8,
+				})
 				if(poachers[i].type == 1){
 					poachers[i].obj.anims.play('poachershootdown', true)
 				}
@@ -656,9 +676,6 @@ gamescene.update = function(){
 				else if(poachers[i].type == 4){
 					poachers[i].obj.anims.play('poachershootleft', true)
 				}
-				poachers[i].shootSound.play({
-					volume: 0.8
-				})
 			}
 			else{
 				poachers[i].obj.anims.play('poacherstand', true)
@@ -679,12 +696,12 @@ gamescene.update = function(){
 	}
 	
 	//devesh    
-    this.input.on('pointerup', funcFox, this);
+	this.input.on('pointerup', funcFox, this);
 	
 	for(var i=0;i<num_foxes ;i++)
 	{
 		//attack of fox 
-		if(fox[i].stand || fox[i].selected){
+		if(fox[i].stand){
 			if(fox[i].cutter==-1)
 			{
 				for(var j = 0 ; j < num_cutters ; j++)
@@ -742,15 +759,11 @@ gamescene.update = function(){
 				}
 			}
 			else{
-				if(fox[i].stand == true){
-					fox[i].obj.anims.play('foxstand', true);
-				}
-				if(fox[i].selected == true){
-					fox[i].obj.anims.play('selectedFox', true);	
-				}
+				fox[i].obj.anims.play('foxstand', true);
 			}
 		}
-		
+
+
 		fox[i].move();
 		if(fox[i].obj.body.velocity.x > 0){
 			fox[i].obj.anims.play('foxright', true)
@@ -763,6 +776,9 @@ gamescene.update = function(){
 		}
 		else if(fox[i].obj.body.velocity.y < 0){
 			fox[i].obj.anims.play('foxup', true)
+		}
+		if(fox[i].selected == true){
+			fox[i].obj.anims.play('selectedFox', true);	
 		}
 	}
 	
@@ -793,7 +809,7 @@ gamescene.update = function(){
 			}
 		}
 		if(cutters[i].active == 1)
-		cutters[i].move()       
+			cutters[i].move()       
 		
 		
 		if(cutters[i].obj.body.velocity.x > 0){
@@ -908,14 +924,19 @@ gamescene.update = function(){
 				timer.reset();
 				scientist.setOpp(poachers[i])
 				scientist.inGame = 1;
+				scientist.obj.alpha = 0.1
 			}        
 		}
 	}
 	
 	if(scientist.inGame==1)
 	{
-		// GAME1 /////////////////////////////////////
+		scientist.teleport()
+	}
+
+	if(scientist.inGame == 2){
 		
+		// GAME1 /////////////////////////////////////
 		for (var i =0 ;i < num_active_wastes ; i++)
 		{
 			if(waste[active_wastes[i]].inBin == 0)
@@ -980,8 +1001,8 @@ gamescene.update = function(){
 				bins[i].hide();	
 			}
 			timer.hide();
-			scientist.reset(1);
-			killPoacher(scientist.opponent)
+			// scientist.reset(1);
+			scientist.inGame = 3
 		}
 		else if(timer.health <= 0){
 			waste_cnt = 0;
@@ -999,6 +1020,16 @@ gamescene.update = function(){
 		if(timer.start == 1)
 		{
 			timer.reduce();
+		}
+	}
+	if(scientist.inGame == 3){
+		console.log(spaceBar)
+		if(spaceBar.isDown){
+			explosion.body.x = scientist.opponent.obj.getCenter().x - explosion.body.width/2
+			explosion.body.y = scientist.opponent.obj.getCenter().y - explosion.body.height/2
+			explosion.anims.play('explosion', true)
+			killPoacher(scientist.opponent)
+			scientist.reset(1)
 		}
 	}
 	//////////////////////////////////////////////

@@ -67,7 +67,7 @@ class Cutter{
 		var center = this.obj.getCenter()
 		if(Math.abs(center.x - this.destx) < Math.abs(center.y - this.desty)){
 			if(center.y < this.desty){
-				this.cutfrom = 'top'
+				this.cutfrom = 'left'
 			}
 			else{
 				this.cutfrom = 'bottom'
@@ -78,13 +78,9 @@ class Cutter{
 				this.cutfrom = 'right'
 			}
 			else{
-				this.cutfrom = 'left'
+				this.cutfrom = 'top'
 			}	
 		}
-		// this.cutSound.play({
-		// 	loop: true,
-		// 	rate: 2
-		// })
 	}
 	stopCutting(){
 		this.iscutting = 0;
