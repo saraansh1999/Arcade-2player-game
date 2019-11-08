@@ -49,6 +49,13 @@ gamescene.preload = function(){
 	this.load.audio('explosion', 'assets/sounds/explosion.wav', {
 		instances: 1
 	});
+	this.load.audio('wasteP', 'assets/sounds/waste_positive.mp3', {
+		instances: 1
+	});
+
+	this.load.audio('wasteN', 'assets/sounds/waste_negative.mp3', {
+		instances: 1
+	});
 	this.load.image('sand', 'assets/sand2.jpg');
 	this.load.image('sky', 'assets/sky.png');
 	this.load.image('tree', 'assets/treenew.png');
@@ -119,7 +126,7 @@ gamescene.create = function(){
 	//soundtracks
 	let bgmusic = this.sound.add('jungle');
 	bgmusic.play({
-		volume: .3,
+		volume: .2,
 		loop: true
 	})
 	explosion_sound = this.sound.add('explosion')
@@ -210,6 +217,10 @@ gamescene.create = function(){
 
 
 	///GAME1 //////////////////////////////////////
+	wasteP_sound = this.sound.add('wasteP')
+	wasteN_sound = this.sound.add('wasteN')
+	
+
 	num_bins = 3;
 	var a = 45;
 	var b = 50;
@@ -674,7 +685,7 @@ gamescene.update = function(){
 		if(poachers[i].obj.body.velocity.x == 0 && poachers[i].obj.body.velocity.y == 0){
 			if(poachers[i].crosshair.alpha >= 0.9){
 				poachers[i].shootSound.play({
-					volume: 0.8,
+					volume: 0.3,
 				})
 				if(poachers[i].type == 1){
 					poachers[i].obj.anims.play('poachershootdown', true)
@@ -981,6 +992,9 @@ gamescene.update = function(){
 					{
 						if(waste[id].type==bins[i].type)
 						{
+							wasteP_sound.play({
+								volume: 0.8
+							})
 							scientist.curWaste = -1;
 							waste[id].inBin = 1;
 							waste[id].isPicked = 0;
@@ -989,6 +1003,9 @@ gamescene.update = function(){
 						}
 						else
 						{
+							wasteN_sound.play({
+								volume: 0.8
+							})
 							scientist.curWaste = -1;
 							waste[id].inBin = 1;
 							waste[id].isPicked = 0;
