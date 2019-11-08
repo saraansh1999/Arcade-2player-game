@@ -51,6 +51,7 @@ gamescene.preload = function(){
 	this.load.image('tree', 'assets/treenew.png');
 	this.load.image('healthBar', 'assets/lifebar.png');
 	this.load.image('seperator', 'assets/seperator.png');
+	this.load.image('seperator2', 'assets/seperator2.png');
 	this.load.image('plasticBin', 'assets/plastic.png');
 	this.load.image('organicBin', 'assets/organic.png');
 	this.load.image('paperBin', 'assets/paper.png');
@@ -154,9 +155,6 @@ gamescene.create = function(){
 	}
 	
 	//create health bars
-	
-	
-	
 	num_foxes = 1;
 	fox =  []; 
 	// create fox
@@ -195,11 +193,17 @@ gamescene.create = function(){
 	
 	//create scientist
 	scientist = new Scientist(this.physics.add.sprite(400, 300, 'scientist'));
-	seperators = this.physics.add.staticGroup();
-	seperators.create(900,230,'seperator').setScale(2).refreshBody();
-	seperators.create(1390,230,'seperator').setScale(2).refreshBody();
-	this.physics.add.collider(scientist.obj, seperators);
-	
+    //walls
+    seperators = this.physics.add.staticGroup();
+    seperators.create(900,230,'seperator').setScale(2).refreshBody();
+    seperators.create(1390,230,'seperator').setScale(2).refreshBody();
+    seperators.create(10,230,'seperator').setScale(2).refreshBody();
+    seperators.create(200,-15,'seperator2').setScale(5).refreshBody();
+    seperators.create(200,725,'seperator2').setScale(5).refreshBody();
+    this.physics.add.collider(scientist.obj, seperators);
+    this.physics.add.collider(fox[0].obj, seperators);
+
+
 	///GAME1 //////////////////////////////////////
 	num_bins = 3;
 	var a = 45;
@@ -481,10 +485,13 @@ gamescene.create = function(){
 
 function funcFox(pointer){
 	if(fox[0].selected){
-		fox[0].moving = true;
-		fox[0].selected = false;
-		fox[0].destx = pointer.x;
-		fox[0].desty = pointer.y;
+    		if(pointer.x >=50 && pointer.x <=860 &&pointer.y >= 50 &&pointer.y <= 700)
+    		{
+	    		fox[0].moving = true;
+	    		fox[0].selected = false;
+	    		fox[0].destx = pointer.x;
+	    		fox[0].desty = pointer.y;
+    		}
 	}
 }
 function selectFox(obj){
@@ -1037,7 +1044,7 @@ gamescene.update = function(){
 	nt = d.getTime();
 	if(d.getTime()-pre > 3000 && active_cutters < total_cutters)
 	{
-		pre = t;
+		pre = nt;
 		cutters[active_cutters].active = 1;
 		cutters[active_cutters].obj.visible = 1
 		active_cutters=active_cutters + 1;
@@ -1103,7 +1110,7 @@ introduction.create = function(){
 	this.bg = this.add.image(700, 280, 'bg');
 	this.title = this.add.image(700, 100, 'button_title');
 	this.skipButton = this.add.image(1300, 400, 'button_skip');
-	this.skipButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains).on('pointerdown', () => {this.scene.start("homescreen");} );;	
+	this.skipButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains).on('pointerdown', () => {this.scene.switch("homescreen");} );;	
 
 	this.scientist = new Scientist(this.physics.add.sprite(400, 350, 'scientist'));
 	this.scientist.obj.scaleX = 2;
