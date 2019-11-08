@@ -46,6 +46,9 @@ gamescene.preload = function(){
 	this.load.audio('woodcut', 'assets/sounds/woodcut.mp3', {
 		instances: 1
 	});
+	this.load.audio('explosion', 'assets/sounds/explosion.wav', {
+		instances: 1
+	});
 	this.load.image('sand', 'assets/sand2.jpg');
 	this.load.image('sky', 'assets/sky.png');
 	this.load.image('tree', 'assets/treenew.png');
@@ -110,6 +113,7 @@ var active_wastes = []
 var d = new Date()
 var t = d.getTime()
 var spaceBar
+var explosion_sound
 
 gamescene.create = function(){
 	//soundtracks
@@ -118,6 +122,7 @@ gamescene.create = function(){
 		volume: .3,
 		loop: true
 	})
+	explosion_sound = this.sound.add('explosion')
 	//set bg
 	this.bg = this.add.image(0, 0, 'sand').setScale(4);
 	sk = this.add.image(1170, 400, 'sky');
@@ -1032,6 +1037,9 @@ gamescene.update = function(){
 	if(scientist.inGame == 3){
 		console.log(spaceBar)
 		if(spaceBar.isDown){
+			explosion_sound.play({
+				volume: 0.8
+			})
 			explosion.body.x = scientist.opponent.obj.getCenter().x - explosion.body.width/2
 			explosion.body.y = scientist.opponent.obj.getCenter().y - explosion.body.height/2
 			explosion.anims.play('explosion', true)
