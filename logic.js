@@ -1090,19 +1090,134 @@ homescreen.update = function(){
 
 introduction.preload = function(){
 	this.load.plugin('DialogModalPlugin', './dialog_plugin.js');
-	this.load.image('bg', 'assets/bg.jpg');
+	this.load.image('bg', 'assets/lab.jpg')
 	this.load.image('button_title', 'assets/button_feral-retaliation.png');
 	this.load.image('button_skip', 'assets/button_skip.png');
+	this.load.image('invention', 'assets/invention.png');
+	this.load.spritesheet('scientist', 'assets/scientist.png', {
+		frameWidth: 64 , frameHeight: 64
+	});
 }
 
 introduction.create = function(){
-	this.bg = this.add.image(700, 325, 'bg').setScale(1.6);    
+	this.bg = this.add.image(700, 280, 'bg');
 	this.title = this.add.image(700, 100, 'button_title');
 	this.skipButton = this.add.image(1300, 400, 'button_skip');
 	this.skipButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains).on('pointerdown', () => {this.scene.start("homescreen");} );;	
+
+	this.scientist = new Scientist(this.physics.add.sprite(400, 350, 'scientist'));
+	this.scientist.obj.scaleX = 2;
+	this.scientist.obj.scaleY = 2;
+	this.invention = this.physics.add.sprite(1300, 100, 'invention').setScale(0.05);
+	this.invention.setInteractive();
+	this.invention.tint = 0xffff00;
+	this.invention.on('pointerdown', startDrag, this);
+	this.physics.add.collider(this.invention, this.scientist.obj, collideScientist, null, this);
+	this.scFlag = 0;
+	this.collided = 0;
+	this.done = 0;
+	this.tempCount = 0;
+
 	this.sys.install('DialogModalPlugin');
 	this.sys.dialogModal.init();
 	this.sys.dialogModal.setText('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', true);
+	
+	this.anims.create({
+		key: 'scientistup',
+		frames: this.anims.generateFrameNumbers('scientist', {start: 13, end: 16}),
+		frameRate: 10,
+		repeat: -1
+	});
+	this.anims.create({
+		key: 'scientistdown',
+		frames: this.anims.generateFrameNumbers('scientist', {start: 0, end: 3}),
+		frameRate: 10,
+		repeat: -1
+	});
+	this.anims.create({
+		key: 'scientistleft',
+		frames: this.anims.generateFrameNumbers('scientist', {start: 4, end: 7}),
+		frameRate: 10,
+		repeat: -1
+	});
+	this.anims.create({
+		key: 'scientistright',
+		frames: this.anims.generateFrameNumbers('scientist', {start: 8, end: 11}),
+		frameRate: 10,
+		repeat: -1
+	});
+	this.anims.create({
+		key: 'scientistturn',
+		frames: this.anims.generateFrameNumbers('scientist', {start: 0, end: 0}),
+		frameRate: 10,
+		repeat: -1
+	});
+}
+function collideScientist(inv, sct){
+	inv.destroy();
+	this.collided = 1;
+	sct.setVelocityX(0);
+	sct.setVelocityY(0);
+	sct.anims.play('scientistturn', true);
+	sct.scaleX = 2.5;
+	sct.scaleY = 2.5;
+}
+introduction.update = function(){
+	this.tempCount += 1;
+	if(this.done == 0){
+		if(this.tempCount > 100){
+			this.invention.tint = Math.random() * 0xffffff;
+			this.tempCount = 0;
+		}
+	}
+		
+	if(this.scFlag == 0 && this.collided == 0 && this.done == 0){
+		this.scientist.obj.setVelocityX(300);
+		this.scientist.obj.setVelocityY(0);
+		this.scientist.obj.anims.play('scientistright', true);
+		if(this.scientist.obj.x > 1000){
+			this.scFlag = 1;
+			this.scientist.obj.anims.play('scientistturn', true);	
+		}
+	}else if(this.scFlag == 1 && this.collided == 0 && this.done == 0){
+		this.scientist.obj.setVelocityX(-300);
+		this.scientist.obj.setVelocityY(0);
+		this.scientist.obj.anims.play('scientistleft', true);
+		if(this.scientist.obj.x < 400){
+			this.scFlag = 0;
+			this.scientist.obj.anims.play('scientistturn', true);	
+		}
+	}
+	
+	if(this.collided == 1){
+		this.scientist.obj.setVelocityX(0);
+		this.scientist.obj.setVelocityY(100);
+		this.scientist.obj.anims.play('scientistdown', true);
+		if(this.scientist.obj.y > 480){
+			this.collided = 0;
+			this.done = 1;
+			this.scientist.obj.setVelocityY(0);
+			this.scientist.obj.anims.pause();
+		}
+	}
+}
+
+function startDrag(){
+	this.input.off('pointerdown', startDrag, this);
+	this.input.on('pointerup', stopDrag, this);
+}
+
+function stopDrag(pointer){
+	this.input.on('pointerdown', startDrag, this);
+	var tween = this.tweens.add({
+		targets: this.invention,
+		x: pointer.x,
+		y: pointer.y,
+		duration: 2000,
+		ease: "Linear",
+		easeParams: [0.5, 0.5],
+		delay: 0
+	}, this);
 }
 
 game.scene.add('homescreen', homescreen);
