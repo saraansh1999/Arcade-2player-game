@@ -44,7 +44,7 @@ DialogModalPlugin.prototype = {
     this.windowHeight = opts.windowHeight || 150;
     this.padding = opts.padding || 32;
     this.closeBtnColor = opts.closeBtnColor || 'darkgoldenrod';
-    this.dialogSpeed = opts.dialogSpeed || 3;
+    this.dialogSpeed = opts.dialogSpeed || 4;
 
     this.eventCounter = 0;
     this.visible = true;
@@ -93,7 +93,35 @@ DialogModalPlugin.prototype = {
       });
     }
   },
+  updateText(text, animate){
+    this.eventCounter = 0;
+    this.dialog = text.split('');
+    if (this.timedEvent) this.timedEvent.remove();
+    if (this.text) this.text.destroy();
 
+    var x = this.padding + 10;
+    var y = this._getGameHeight() - this.windowHeight - this.padding + 10;
+
+    this.text = this.scene.make.text({
+      x,
+      y,
+      text,
+      style: {
+        wordWrap: { width: this._getGameWidth() - (this.padding * 2) - 25 },
+        font: 'bold 24px Broadway'
+      }
+    });
+    this.text.setText("");
+    
+    if (animate) {
+      this.timedEvent = this.scene.time.addEvent({
+        delay: 150 - (this.dialogSpeed * 30),
+        callback: this._animateText,
+        callbackScope: this,
+        loop: true
+      });
+    }
+  },
   // Calcuate the position of the text in the dialog window
   _setText: function (text) {
     // Reset the dialog
@@ -107,7 +135,8 @@ DialogModalPlugin.prototype = {
       y,
       text,
       style: {
-        wordWrap: { width: this._getGameWidth() - (this.padding * 2) - 25 }
+        wordWrap: { width: this._getGameWidth() - (this.padding * 2) - 25 },
+        font: 'bold 24px Broadway'
       }
     });
   },
@@ -121,8 +150,8 @@ DialogModalPlugin.prototype = {
 
     this._createOuterWindow(windowDimensions);
     this._createInnerWindow(windowDimensions);
-    this._createCloseModalButtonBorder();
-    this._createCloseModalButton();
+    // this._createCloseModalButtonBorder();
+    // this._createCloseModalButton();
   },
 
   // Gets the width of the game (based on the scene)

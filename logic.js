@@ -3,7 +3,7 @@ CANVAS_H = 600;
 
 var gamescene = new Phaser.Scene("gamescene");
 var homescreen = new Phaser.Scene("homescreen");
-var introduction = new Phaser.Scene("introduction");
+var introduction1 = new Phaser.Scene("introduction1");
 
 function findDis(a, b){
 	var t = a.x - b.x;
@@ -1120,10 +1120,11 @@ homescreen.create = function(){
 homescreen.update = function(){
 }
 
-introduction.preload = function(){
+introduction1.preload = function(){
 	this.load.plugin('DialogModalPlugin', './dialog_plugin.js');
 	this.load.image('bg', 'assets/lab.jpg')
 	this.load.image('button_title', 'assets/button_feral-retaliation.png');
+	this.load.image('button_next', 'assets/button_next.png');
 	this.load.image('button_skip', 'assets/button_skip.png');
 	this.load.image('invention', 'assets/invention.png');
 	this.load.spritesheet('scientist', 'assets/scientist.png', {
@@ -1131,11 +1132,15 @@ introduction.preload = function(){
 	});
 }
 
-introduction.create = function(){
+introduction1.create = function(){
 	this.bg = this.add.image(700, 280, 'bg');
 	this.title = this.add.image(700, 100, 'button_title');
 	this.skipButton = this.add.image(1300, 400, 'button_skip');
-	this.skipButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains).on('pointerdown', () => {this.scene.switch("homescreen");} );;	
+	this.skipButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains).on('pointerdown', () => {this.scene.switch("homescreen");} );
+
+	this.nextButton = this.add.image(1300, 470, 'button_next');
+	this.skipButton.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains).on('pointerdown', () => {this.scene.switch("introduction12");} );	
+	this.nextButton.visible = false;
 
 	this.scientist = new Scientist(this.physics.add.sprite(400, 350, 'scientist'));
 	this.scientist.obj.scaleX = 2;
@@ -1152,7 +1157,7 @@ introduction.create = function(){
 
 	this.sys.install('DialogModalPlugin');
 	this.sys.dialogModal.init();
-	this.sys.dialogModal.setText('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', true);
+	this.sys.dialogModal.setText('Arrrgh!! The world as we know it is soon going to come to an end and here I am stuck at the same problem for my new invention since the past 5 years.\n All I need is to cross paths with one LightBulb moment and I\'ll change the world forever.', true);
 	
 	this.anims.create({
 		key: 'scientistup',
@@ -1194,7 +1199,7 @@ function collideScientist(inv, sct){
 	sct.scaleX = 2.5;
 	sct.scaleY = 2.5;
 }
-introduction.update = function(){
+introduction1.update = function(){
 	this.tempCount += 1;
 	if(this.done == 0){
 		if(this.tempCount > 100){
@@ -1232,6 +1237,13 @@ introduction.update = function(){
 			this.scientist.obj.anims.pause();
 		}
 	}
+	if(this.done == 1){
+		this.sys.dialogModal.updateText("Thanks for helping me find this idea. We are going to save the world!!", true);
+		this.done = 2;
+	}
+	if(this.done == 2){
+		this.nextButton.visible = true;
+	}
 }
 
 function startDrag(){
@@ -1254,7 +1266,7 @@ function stopDrag(pointer){
 
 game.scene.add('homescreen', homescreen);
 game.scene.add('gamescene', gamescene);
-game.scene.add('introduction', introduction);
+game.scene.add('introduction1', introduction1);
 // game.scene.start('homescreen');
-game.scene.start('introduction');
+game.scene.start('introduction1');
 // game.scene.start('gamescene');
