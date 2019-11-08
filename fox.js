@@ -17,7 +17,7 @@ class Fox{
     	this.health -= 10
     	console.log("HIT", this.health)
     }
-    clip(c){
+    clip(c ){
 		if(c == 'x'){
 			if(Math.abs(this.destx - this.obj.x) < this.vel/20)
 				this.obj.x = this.destx;
@@ -56,8 +56,6 @@ class Fox{
 			else{
 				this.obj.setVelocityX(0)
             }
-            
-            
         }
     }
     stop(){

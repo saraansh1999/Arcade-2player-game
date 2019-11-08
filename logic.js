@@ -117,7 +117,7 @@ gamescene.create = function(){
     active_cutters = 0;
     total_cutters = 20;
     var a =50;
-    cutters = []
+    cutters = [];
     for (var i = 0; i < num_cutters; i++) {
     	var x = -20;
     	var y = a
@@ -134,12 +134,11 @@ gamescene.create = function(){
     num_foxes = 1;
     fox =  []; 
     // create fox
-    
+    foxhealth = new HealthBar(this.add.image(400,380,'healthBar'));
+    foxhealth.obj.setTint(0xff0000);
     for (var i =0 ;i < num_foxes ; i++)
     {
-    	var x = Phaser.Math.RND.between(100, CANVAS_W-100);
-    	var y = Phaser.Math.RND.between(100, CANVAS_H-100);
-    	temp_fox = new Fox(this.physics.add.sprite(x, y, 'fox'), 200);
+    	temp_fox = new Fox(this.physics.add.sprite(400, 400, 'fox'), 200);
     	temp_fox.obj.setInteractive();
     	fox.push(temp_fox);
     }
@@ -160,7 +159,7 @@ gamescene.create = function(){
     	var tempBar=new HealthBar(this.add.image(x,y-50,'healthBar'));
     	bar.push(tempBar);
     }
-   
+
     //create poachers
     num_poachers = 0
     poachers = []
@@ -484,7 +483,7 @@ gamescene.update = function(){
     d = new Date()
 
 
-    if(d.getTime() - t > 10000){
+    if(d.getTime() - t > 1000){
     	// console.log("check", t%100000, d.getTime()%100000)
     	t = d.getTime()
     	let arr = shuffle([1, 2, 3, 4])
@@ -555,6 +554,7 @@ gamescene.update = function(){
     		for(let j = 0; j < num_foxes; j++){
     			if(findDis(poachers[i].crosshair, fox[j].obj) < poachers[i].blastRadius){
     				fox[j].hit()
+    				foxhealth.reduce();
     				f++;
     			}
     		}
@@ -825,7 +825,6 @@ gamescene.update = function(){
     	}
     }
 
-
     if(scientist.inGame==1)
     {
         // GAME1 /////////////////////////////////////
@@ -918,13 +917,16 @@ gamescene.update = function(){
     }
     //////////////////////////////////////////////
     d = new Date()
-    t = d.getTime();
-    if(t-pre > 3000 && active_cutters < total_cutters)
+    nt = d.getTime();
+    if(d.getTime()-pre > 3000 && active_cutters < total_cutters)
     {
     	pre = t;
     	cutters[active_cutters].active = 1;
     	active_cutters=active_cutters + 1;
     }
+
+    foxhealth.obj.x = fox[0].obj.x;
+    foxhealth.obj.y = fox[0].obj.y-20;
 }
 
 homescreen.preload = function(){
