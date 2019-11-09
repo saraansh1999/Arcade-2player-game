@@ -8,7 +8,7 @@ class Poacher{
 		this.type = type
 		this.crosshair = chobj
 		this.crosshair.alpha = 0.1
-		this.shooting = -1000
+		this.shooting = -300
 		this.blastRadius = this.crosshair.displayWidth
 		this.shootSound = undefined
 	}
@@ -29,7 +29,7 @@ class Poacher{
 	}
 	shoot(success){
 		this.crosshair.alpha = 0.1
-		this.shooting = -400
+		this.shooting = -100
 		this.crosshair.x = this.obj.x
 		this.crosshair.y = this.obj.y
 		this.crosshair.setVelocityY(0)
@@ -68,9 +68,9 @@ class Poacher{
 			else if(this.crosshair.y < this.target.obj.y){
 				this.crosshair.setVelocityY(this.cvel)
 			}
-			// if(this.crosshair.body.velocity.y == 0 && this.crosshair.body.velocity.x == 0)
-				// this.crosshair.alpha += 0.005
-			// else
+			if(this.crosshair.body.velocity.y == 0 && this.crosshair.body.velocity.x == 0)
+				this.crosshair.alpha += 0.005
+			else
 				this.crosshair.alpha += 0.001
 		}
 		if(this.moving){

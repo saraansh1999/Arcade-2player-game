@@ -58,6 +58,12 @@ gamescene.preload = function(){
 	this.load.audio('wasteN', 'assets/sounds/waste_negative.mp3', {
 		instances: 1
 	});
+	this.load.audio('win', 'assets/sounds/win.mp3', {
+		instances: 1
+	});
+	this.load.audio('lose', 'assets/sounds/lose.mp3', {
+		instances: 1
+	});
 	this.load.image('sand', 'assets/sand2.jpg');
 	this.load.image('sky', 'assets/sky.png');
 	this.load.image('tree', 'assets/treenew.png');
@@ -79,6 +85,7 @@ gamescene.preload = function(){
 	this.load.image('fruit1', 'assets/fruit1.png');
 	this.load.image('notebook', 'assets/notebookwaste.png');
 	this.load.image('paperroll', 'assets/paperroll.png');
+	this.load.image('seg', 'assets/seg.png');
 	
 	this.load.spritesheet('cutter', 'assets/cutter_sprites.png', 
 		{frameWidth: 64, frameHeight: 64}
@@ -114,7 +121,8 @@ gamescene.preload = function(){
 }
 
 var num_cutters, cutters, num_trees, trees, poachers, poachertl=false, poachertr=false, poacherbl=false, poacherbr=false;;
-var num_foxes,active_cutters,total_cutters,tot_poachers=0 ;
+var num_foxes,active_cutters,total_cutters,tot_poachers=0, dead_cutters = 0 ;
+var seg
 var num_bins ;
 var waste_cnt;
 var cnt_active_wastes;
@@ -122,24 +130,29 @@ var active_wastes = []
 var d = new Date()
 var t = d.getTime()
 var spaceBar
-var explosion_sound
+var explosion_sound, bgmusic, winSound, loseSound
+var score = 0, scoreText
 
 gamescene.create = function(){
+
+
 	//soundtracks
-	let bgmusic = this.sound.add('jungle');
+	bgmusic = this.sound.add('jungle');
 	bgmusic.play({
 		volume: .2,
 		loop: true
 	})
 	explosion_sound = this.sound.add('explosion')
+	winSound = this.sound.add('win')
+	loseSound = this.sound.add('lose')
 	//set bg
 	this.bg = this.add.image(0, 0, 'sand').setScale(4);
 	sk = this.add.image(1170, 400, 'sky');
 	sk.setDisplaySize(550,900);
 	//create woodcutter
-	num_cutters = 20;
+	num_cutters = 15;
 	active_cutters = 0;
-	total_cutters = 20;
+	total_cutters = 15;
 	var a =50;
 	cutters = [];
 	for (var i = 0; i < num_cutters; i++) {
@@ -192,29 +205,31 @@ gamescene.create = function(){
     a = 150
     b = 150
     for (var i = 0; i < num_trees; i++) {
-        var x = Phaser.Math.RND.between(a-50, a+50);
-        var y = Phaser.Math.RND.between(b-50, b+50);
+    	var x = Phaser.Math.RND.between(a-50, a+50);
+    	var y = Phaser.Math.RND.between(b-50, b+50);
         // console.log(i,a,x,y);
         trees.create(x, y, 'tree').setScale(0.8).setSize(72, 96, 36, 48);
         
         var tempBar=new HealthBar(this.add.image(x,y-50,'healthBar'));
-        bar.push(tempBar);
+        bar.push(tempBar);seg
         b = b+125;
         if(b == 650)
         {
-            b = 150;
-            a = a + 175;
+        	b = 150;
+        	a = a + 175;
         }
     }
 
-	
+    seg = this.add.image(1144, 450, 'seg').setScale(0.4)
+    seg.visible = 0
+
 	//explosion
 	explosion = this.physics.add.sprite(-100, -100, 'explosion').setScale(0.6)
 
 	//create poachers
 	num_poachers = 0
 	poachers = []
-	
+
 	//create scientist
 	scientist = new Scientist(this.physics.add.sprite(400, 300, 'scientist'));
     //walls
@@ -509,17 +524,19 @@ gamescene.create = function(){
 			}
 		}
 	}
+	//text
+	scoreText = this.add.text(20, 20, 'score: 0', { fontSize: '32px', fill: '#000' });
 }
 
 function funcFox(pointer){
 	if(fox[0].selected){
-    		if(pointer.x >=50 && pointer.x <=860 &&pointer.y >= 50 &&pointer.y <= 700)
-    		{
-	    		fox[0].moving = true;
-	    		fox[0].selected = false;
-	    		fox[0].destx = pointer.x;
-	    		fox[0].desty = pointer.y;
-    		}
+		if(pointer.x >=50 && pointer.x <=860 &&pointer.y >= 50 &&pointer.y <= 700)
+		{
+			fox[0].moving = true;
+			fox[0].selected = false;
+			fox[0].destx = pointer.x;
+			fox[0].desty = pointer.y;
+		}
 	}
 }
 function selectFox(obj){
@@ -534,6 +551,14 @@ function shuffle(array) {
 		[array[i], array[j]] = [array[j], array[i]];
 		return array
 	}
+}
+
+function gameKhatam(scene, sound, victory=0){
+	sound.play()
+	if(victory == 1){
+		score += num_trees * 200
+	}
+	scene.switch("endscreen")
 }
 
 function killPoacher(poacher){
@@ -554,14 +579,16 @@ function killPoacher(poacher){
 		}
 	}
 	num_poachers -= 1
-	// d = new Date
-	// t = d.getTime()
+	score += 500
+	d = new Date
+	t = d.getTime()
 }
 
 var pre = d.getTime();
 gamescene.update = function(){
 	
-	
+	scoreText.setText('Score: ' + score)
+
 	//scientist movements/////////////////
 	if(scientist.can_move){
 		if (cursors.left.isDown)
@@ -597,82 +624,82 @@ gamescene.update = function(){
 	}
 	/////////////////////////////////////////
 	
-    
-    d = new Date()
-    
-    val = 10000;
-    if(tot_poachers >= 4)
-    {
-        val =20000;
-    }
-    else if(tot_poachers == 0)
-    {
-        val = 0;
-    }
-    if(d.getTime() - t > val ){
-        tot_poachers +=1 ;
-        t = d.getTime()
-        let arr = shuffle([1, 2, 3, 4])
-        for(var i = 0; i < 4; i++){
-            if(arr[i] == 1){
-                if(!poachertl){
-                    var y = -100
-                    var x = -100
-                    var destx = 50
-                    var desty = 50
-                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 1);
-                    tempPoacher.shootSound = this.sound.add('arrow')
-                    poachers.push(tempPoacher)
-                    num_poachers += 1
-                    poachertl = true
-                    break;
-                }
-            }
-            else if(arr[i] == 2){
-                if(!poacherbl){
-                    var y = CANVAS_H + 35
-                    var x = -100
-                    var destx = 50
-                    var desty = CANVAS_H + 35;
-                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 2);
-                    tempPoacher.shootSound = this.sound.add('arrow')
-                    poachers.push(tempPoacher)
-                    num_poachers += 1
-                    poacherbl = true
-                    break;
-                }
-            }
-            else if(arr[i] == 3){
-                if(!poacherbr){
-                    var x = CANVAS_W + 160;
-                    var y = CANVAS_H + 160;
-                    var destx = CANVAS_W + 30;
-                    var desty = CANVAS_H + 35;
-                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 3);
-                    tempPoacher.shootSound = this.sound.add('arrow')
-                    poachers.push(tempPoacher)
-                    num_poachers += 1
-                    poacherbr = true
-                    break;
-                }
-                
-            }
-            else if(arr[i] == 4){
-                if(!poachertr){
-                    var y = -100
-                    var x = CANVAS_W
-                    var destx = CANVAS_W + 30 ;
-                    var desty = 50
-                    tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 4);
-                    tempPoacher.shootSound = this.sound.add('arrow')
-                    poachers.push(tempPoacher)
-                    num_poachers += 1
-                    poachertr = true
-                    break;
-                }
-            }
-        }
-    }
+
+	d = new Date()
+
+	val = 10000;
+	if(tot_poachers >= 4)
+	{
+		val =20000;
+	}
+	else if(tot_poachers == 0)
+	{
+		val = 0;
+	}
+	if(d.getTime() - t > val ){
+		tot_poachers +=1 ;
+		t = d.getTime()
+		let arr = shuffle([1, 2, 3, 4])
+		for(var i = 0; i < 4; i++){
+			if(arr[i] == 1){
+				if(!poachertl){
+					var y = -100
+					var x = -100
+					var destx = 50
+					var desty = 50
+					tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 1);
+					tempPoacher.shootSound = this.sound.add('arrow')
+					poachers.push(tempPoacher)
+					num_poachers += 1
+					poachertl = true
+					break;
+				}
+			}
+			else if(arr[i] == 2){
+				if(!poacherbl){
+					var y = CANVAS_H + 35
+					var x = -100
+					var destx = 50
+					var desty = CANVAS_H + 35;
+					tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 2);
+					tempPoacher.shootSound = this.sound.add('arrow')
+					poachers.push(tempPoacher)
+					num_poachers += 1
+					poacherbl = true
+					break;
+				}
+			}
+			else if(arr[i] == 3){
+				if(!poacherbr){
+					var x = CANVAS_W + 160;
+					var y = CANVAS_H + 160;
+					var destx = CANVAS_W + 30;
+					var desty = CANVAS_H + 35;
+					tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 3);
+					tempPoacher.shootSound = this.sound.add('arrow')
+					poachers.push(tempPoacher)
+					num_poachers += 1
+					poacherbr = true
+					break;
+				}
+
+			}
+			else if(arr[i] == 4){
+				if(!poachertr){
+					var y = -100
+					var x = CANVAS_W
+					var destx = CANVAS_W + 30 ;
+					var desty = 50
+					tempPoacher = new Poacher(this.physics.add.sprite(x, y, 'poacher'), this.physics.add.sprite(x, y, 'crosshair'), 200, destx, desty, 4);
+					tempPoacher.shootSound = this.sound.add('arrow')
+					poachers.push(tempPoacher)
+					num_poachers += 1
+					poachertr = true
+					break;
+				}
+			}
+		}
+	}
 	for(var i = 0; i < num_poachers; i++){
 		
 		if(poachers[i].shooting >= 0 && poachers[i].crosshair.alpha >= 1){
@@ -680,7 +707,11 @@ gamescene.update = function(){
 			for(let j = 0; j < num_foxes; j++){
 				if(findDis(poachers[i].crosshair, fox[j].obj) < poachers[i].blastRadius){
 					fox[j].hit()
-					foxhealth.reduce(0.2);
+					foxhealth.reduce(0.4);
+					if(fox[j].health <= 0){
+						bgmusic.stop()
+						gameKhatam(this.scene, loseSound)
+					}
 					f++;
 				}
 			}
@@ -754,7 +785,7 @@ gamescene.update = function(){
 					var dx=(cutters[j].obj.x-fox[i].obj.x);
 					var dy=(cutters[j].obj.y-fox[i].obj.y);
 					var d = (dx*dx+dy*dy);
-					if(d < 8000)
+					if(d < 8000 && cutters[j].health > 0)
 					{
 						fox[i].cutter = j;
 						break;
@@ -789,11 +820,17 @@ gamescene.update = function(){
 					cutters[id].reduce();
 					if(cutters[id].health==0)
 					{
+						score += 10
 						fox[i].cutter = -1;
 						// collider_tree_pov[id].destroy();
 						this.physics.world.removeCollider(collider_tree_pov[id])
-						cutters[id].setDest(20, 650);
+						cutters[id].setDest(-20, 650);
 						// cutters[id].obj.setTint(0x0000ff);
+						dead_cutters += 1
+						if(dead_cutters == num_cutters){
+							bgmusic.stop()
+							gameKhatam(this.scene, winSound, 1)
+						}
 						cutters[id].unstopped = 1;
 						cutters[id].cutfrom = 'no';
 					}
@@ -912,6 +949,10 @@ gamescene.update = function(){
 								bar[j]=bar[j+1];
 							}
 							num_trees=num_trees-1;
+							if(num_trees == 0){
+								bgmusic.stop()
+								gameKhatam(this.scene, loseSound)
+							}
 						}
 					}
 					a = a + 1; 
@@ -939,8 +980,9 @@ gamescene.update = function(){
 			var d = (dx*dx+dy*dy);
 			if(d<4000)
 			{
-				scientist.obj.x = 1200;
-				scientist.obj.y = 450;
+				seg.visible = 1
+				scientist.obj.x = 980;
+				scientist.obj.y = 500;
 				timer.start = 1;
 				waste_cnt = 0;
 				num_active_wastes = 4;
@@ -1052,6 +1094,7 @@ gamescene.update = function(){
 				bins[i].hide();	
 			}
 			timer.hide();
+			seg.visible = 0
 			// scientist.reset(1);
 			scientist.inGame = 3
 		}
@@ -1066,6 +1109,7 @@ gamescene.update = function(){
 				bins[i].hide();
 			}
 			timer.hide();
+			seg.visible = 0
 			scientist.reset(0);
 		}
 		if(timer.start == 1)
@@ -1075,7 +1119,7 @@ gamescene.update = function(){
 	}
 	if(scientist.inGame == 3){
 		scientist.obj.x = 1150;
-        scientist.obj.y = 300 ;
+		scientist.obj.y = 300 ;
 		console.log(spaceBar)
 		if(spaceBar.isDown){
 			explosion_sound.play({
@@ -1107,10 +1151,18 @@ homescreen.preload = function(){
 	this.load.image('bg', 'assets/bg.jpg');
 	this.load.image('button_play', 'assets/button_play.png');
 	this.load.image('button_title', 'assets/button_feral-retaliation.png');
+	this.load.audio('jungle', 'assets/sounds/jungle.mp3', {
+		instances: 1
+	});
 }
 
 homescreen.create = function(){
 	
+	bgmusic = this.sound.add('jungle');
+	bgmusic.play({
+		volume: .2,
+		loop: true
+	})
 	this.bg = this.add.image(700, 325, 'bg').setScale(1.6);    
 	this.title = this.add.image(1500, 100, 'button_title');
 	this.play_button = this.add.image(1300, 1300, 'button_play');
@@ -1227,7 +1279,7 @@ introduction1.update = function(){
 			this.tempCount = 0;
 		}
 	}
-		
+
 	if(this.scFlag == 0 && this.collided == 0 && this.done == 0){
 		this.scientist.obj.setVelocityX(300);
 		this.scientist.obj.setVelocityY(0);
@@ -1298,9 +1350,17 @@ introduction2.preload = function(){
 	this.load.spritesheet('scientist', 'assets/scientist.png', {
 		frameWidth: 64 , frameHeight: 64
 	});
+	this.load.audio('jungle', 'assets/sounds/jungle.mp3', {
+		instances: 1
+	});
 }
 
 introduction2.create = function(){
+	bgmusic = this.sound.add('jungle');
+	bgmusic.play({
+		volume: .2,
+		loop: true
+	})
 	this.bg = this.add.image(700, 200, 'bg').setScale(2);
 	this.bg.scaleX = 2.2;
 	this.bg.scaleY = 2.4;
@@ -1366,6 +1426,7 @@ introduction2.create = function(){
 }
 
 introduction2.update = function(){
+
 	this.tempCount++;
 	console.log(this.tempCount, this.counter);
 
@@ -1415,13 +1476,16 @@ endscreen.preload = function(){
 	this.load.image('button_replay', 'assets/button_replay.png');
 }
 endscreen.create = function(){
+	this.score = this.add.text(625, 250, 'Score: '+score, { fontSize: '32px', fill: '#f4f3ff' });
 	this.gameOver = this.add.image(700, 350, 'button_go');
 	this.replay = this.add.image(700, 450, 'button_replay');
 	this.replay.setInteractive();
 	this.replay.on('pointerdown', () => {
 		this.registry.destroy(); // destroy registry
 		this.events.off(); // disable all active events
-		this.scene.switch("homescreen"); // restart current scene
+		// this.scene.switch("homescreen"); // restart current scene
+		window.location.reload()
+
 	});
 }
 endscreen.update = function(){
@@ -1432,6 +1496,6 @@ game.scene.add('introduction1', introduction1);
 game.scene.add('introduction2', introduction2);
 game.scene.add('endscreen', endscreen);
 // game.scene.start('homescreen');
-// game.scene.start('introduction2');
+game.scene.start('introduction1');
 // game.scene.start('gamescene');
-game.scene.start('endscreen');
+// game.scene.start('endscreen');
