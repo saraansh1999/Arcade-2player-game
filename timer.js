@@ -2,7 +2,7 @@ class Timer
 {
 	constructor(obj){
 		this.obj=obj;
-		this.health = 4;
+		this.health = 5;
 		this.start = 0;
 	}
 
