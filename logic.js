@@ -1148,6 +1148,7 @@ gamescene.update = function(){
 }
 
 homescreen.preload = function(){
+	this.load.image('instructions', 'assets/instructions1.png');
 	this.load.image('bg', 'assets/bg.jpg');
 	this.load.image('button_play', 'assets/button_play.png');
 	this.load.image('button_title', 'assets/button_feral-retaliation.png');
@@ -1164,6 +1165,7 @@ homescreen.create = function(){
 		loop: true
 	})
 	this.bg = this.add.image(700, 325, 'bg').setScale(1.6);    
+	this.instructions = this.add.image(690, 530, 'instructions').setScale(0.6);
 	this.title = this.add.image(1500, 100, 'button_title');
 	this.play_button = this.add.image(1300, 1300, 'button_play');
 	this.play_button.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 200), Phaser.Geom.Rectangle.Contains);
