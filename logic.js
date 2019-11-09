@@ -193,7 +193,7 @@ gamescene.create = function(){
 		fox.push(temp_fox);
 	}
 	this.input.keyboard.on('keyup', function(event){
-		if(event.key == "1")
+		if(event.key == "9")
 			selectFox(fox[0]);
 	}, this);
 	
