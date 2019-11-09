@@ -707,7 +707,7 @@ gamescene.update = function(){
 			for(let j = 0; j < num_foxes; j++){
 				if(findDis(poachers[i].crosshair, fox[j].obj) < poachers[i].blastRadius){
 					fox[j].hit()
-					foxhealth.reduce(0.4);
+					foxhealth.reduce(0.3);
 					if(fox[j].health <= 0){
 						bgmusic.stop()
 						gameKhatam(this.scene, loseSound)

@@ -14,7 +14,7 @@ class Fox{
         this.health = 100
     }
     hit(){
-    	this.health -= 40
+    	this.health -= 30
     }
     clip(c ){
 		if(c == 'x'){
